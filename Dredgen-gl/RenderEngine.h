@@ -8,8 +8,9 @@
 #include <glm/glm.hpp>
 #include "Camera.h"
 #include <cstdint>
+#include "Light.h"
 // headers
-
+#include "Model.h"
 
 class RenderEngine
 {
@@ -38,7 +39,8 @@ private:
 	std::shared_ptr<Camera> main_cam{};
 	//std::vector<Shader> shaders{};
 	std::unordered_map<std::string,Shader> shaders{};
-	std::unordered_map<std::string, uint32_t> VAO{};
+	//std::unordered_map<std::string, uint32_t> VAO{};
+	std::unordered_map<std::string, Model> scene;
 	uint32_t framebuffer;
 	uint32_t textureColorbuffer;
 

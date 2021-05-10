@@ -5,11 +5,12 @@ enum class LightType
     Point,
     Spot
 };
+
 class Light
 {
 public:
     Light() = default;
-    virtual GetColor() const = 0;
+    virtual glm::vec3 GetColor() const = 0;
 
 private:
     glm::vec3 color;
@@ -19,11 +20,14 @@ private:
 class DirectLight : public Light
 {
     public:
-    DirectLight();
-
+    DirectLight(glm::vec3 c,glm::vec3 p,glm::vec3 d);
+    glm::vec3 GetColor()const override;
 };
 
 // the point light dir is (0,0,0)
 class PointLight : public Light
 {
+public:
+    PointLight(glm::vec3 c, glm::vec3 p);
+    glm::vec3 GetColor()const override;
 };

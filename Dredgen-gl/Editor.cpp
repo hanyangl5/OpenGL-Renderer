@@ -117,7 +117,7 @@ void Editor::Run()
 			ImGui::BeginChild(" ");
 			edit_mode->Render();
 			auto tex = edit_mode->GetTexture();
-			ImGui::Image((void*)tex, ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1),ImVec2(1, 0));
+			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::EndChild();
 			ImGui::End();
 		}
@@ -139,6 +139,11 @@ void Editor::Run()
 			ImGui::End();
 		}
 		
+		// infos
+		{
+			ImGui::Begin("infos");
+			ImGui::End();
+		}
 		ImGui::Render();
 		int display_w, display_h;
 		glfwGetFramebufferSize(base_window, &display_w, &display_h);
@@ -158,7 +163,7 @@ void Editor::Run()
 void Editor::processInput(GLFWwindow* window)
 {
 
-	float delta_time=ImGui::GetIO().Framerate/1000.0f;
+	float delta_time=ImGui::GetIO().Framerate/3000.0f;
 	// drag with right mouse button 
 	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
 		edit_mode->render_engine->GetCam()->ProcessMouseMovement(xoffset, yoffset);

@@ -2,8 +2,6 @@
 #include "RenderEngine.h"
 #include <iostream>
 #include "Log.h"
-//#include "imgui_integrate.h"
-
 
 RenderEngine::RenderEngine(uint32_t _width, uint32_t _height)
 {
@@ -34,44 +32,26 @@ void RenderEngine::Render()
 	
 	
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	auto lightingShader = shaders["light"];
-	lightingShader.use();
-	lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-	lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	lightingShader.setVec3("lightPos", lightPos);
-	lightingShader.setVec3("viewPos", main_cam->Position);
+	auto modelshader = shaders["model"];
+	modelshader.use();
 
-	// view/projection transformations
+	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection = glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f);
 	glm::mat4 view = main_cam->GetViewMatrix();
-	glm::mat4 model = glm::mat4(1.0f);
-	lightingShader.setMat4("projection", projection);
-	lightingShader.setMat4("view", view);
+	modelshader.setMat4("projection", projection);
+	modelshader.setMat4("view", view);
 
-	// world transformation
-
-	lightingShader.setMat4("model", model);
-
-	// render the cube
+	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+	//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 	
-	glBindVertexArray(VAO["cubeVAO"]);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (auto object : scene) {
+		modelshader.setMat4("model", model);
+		object.second.Draw(modelshader);
+	}
+	//auto backpack = scene["backpack"];
+	//backpack.Draw(modelshader);
 
-
-	// also draw the lamp object
-	auto lightCubeShader = shaders["lightcube"];
-	lightCubeShader.use();
-	lightCubeShader.setMat4("projection", projection);
-	lightCubeShader.setMat4("view", view);
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, lightPos);
-	model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-	lightCubeShader.setMat4("model", model);
-
-	glBindVertexArray(VAO["lightCubeVAO"]);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	//Log::Log("draw");
-		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
 	// clear all relevant buffers
@@ -106,82 +86,6 @@ void RenderEngine::Init()
 	
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, width, height);
-	Shader li("../resources/lightvs.glsl", "../resources/lightps.glsl", "");
-	shaders.insert({"light", Shader("../resources/lightvs.glsl", "../resources/lightps.glsl","") });
-	shaders.insert({"lightcube",Shader("../resources/lightcubevs.glsl", "../resources/lightcubeps.glsl","") });
-
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-	};
-	// first, configure the cube's VAO (and VBO)
-	uint32_t VBO, cubeVAO;
-	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &VBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindVertexArray(cubeVAO);
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	VAO.insert({ "cubeVAO", cubeVAO });
-
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	uint32_t lightCubeVAO;
-	glGenVertexArrays(1, &lightCubeVAO);
-	glBindVertexArray(lightCubeVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	VAO.insert({ "lightCubeVAO", lightCubeVAO });
 
 	glGenFramebuffers(1, &framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -203,6 +107,14 @@ void RenderEngine::Init()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		Log::Log("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	shaders.insert({ "model", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
+	//scene.insert({ "backpack", Model("../resources/models/backpack/backpack.obj") });
+	//scene.insert({ "helmet", Model("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
+	scene.insert({ "helmet2", Model("../resources/models/FlightHelmet/FlightHelmet.gltf") });
+
+
 
 	//UI ui;
 }
