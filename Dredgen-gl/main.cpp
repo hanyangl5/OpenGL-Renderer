@@ -3,22 +3,21 @@
 #include <iostream>
 // 3rd libs
 // headers
-#include "Window.h"
-#include "imgui_integrate.h"
-const uint32_t w = 1600, h = 900;
+#include "Editor.h"
+const uint32_t w = 1800, h = 1000;
 
 int main(int argc, char* argv[])
 {
-	UI ui;
-	//Window dgewindow{ "dredgen graphic engine",w,h };
+	//UI ui;
+	Editor editor{ "dredgen graphic engine",w,h };
 
-	//try {
-	//	dgewindow.Run();
-	//}
-	//catch (const std::exception& e) {
-	//	std::cerr << e.what() << std::endl;
-	//	return 1;
-	//}
+	try {
+		editor.Run();
+	}
+	catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
 
 
 	return 0;

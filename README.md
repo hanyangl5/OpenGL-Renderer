@@ -1,1 +1,1 @@
-OpenGL
+real-time renderer based on OpenGL
