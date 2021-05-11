@@ -37,6 +37,7 @@ private:
 private:
 	std::shared_ptr<EditMode> edit_mode;
 	float lastX=0.0f, lastY=0.0f;
+	float xoffset = 0.0f, yoffset = 0.0f;
 	bool firstMouse = true;
 };
 

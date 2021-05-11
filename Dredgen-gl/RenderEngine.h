@@ -28,8 +28,7 @@ public:
 	void Update();
 	void Render();
 	void Destroy();
-	std::shared_ptr<Camera> GetCam() {
-		return main_cam;  }
+	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
 private:
 	void Initglad();
@@ -37,9 +36,7 @@ private:
 private:
 	uint32_t width{}, height{};
 	std::shared_ptr<Camera> main_cam{};
-	//std::vector<Shader> shaders{};
 	std::unordered_map<std::string,Shader> shaders{};
-	//std::unordered_map<std::string, uint32_t> VAO{};
 	std::unordered_map<std::string, Model> scene;
 	uint32_t framebuffer;
 	uint32_t textureColorbuffer;

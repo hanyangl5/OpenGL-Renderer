@@ -6,24 +6,7 @@
 // headers
 #include "Editor.h"
 #include "Log.h"
-//float lastX = 1280 / 2.0f;
-//float lastY = 800 / 2.0f;
-//bool firstMouse = true;
 
-// timing
-
-
-float xoffset=0.0f, yoffset=0.0f;
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-
-
-void button_callback(GLFWwindow* window, int a, int b, int c) {
-
-}
 
 Editor::Editor(const char* _name, uint32_t _width, uint32_t _height) : width(_width), height(_height)
 {
@@ -82,7 +65,7 @@ void Editor::Run()
 	{
 		glfwPollEvents();
 
-
+		// process user input
 		{
 			float xpos = io.MousePos.x;
 			float ypos = io.MousePos.y;
@@ -107,10 +90,34 @@ void Editor::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// scene
-		ImGui::ShowDemoWindow();
 		{
-			ImGui::SetNextWindowPos(ImVec2(10,10));
+			if (ImGui::BeginMainMenuBar())
+			{
+				if (ImGui::BeginMenu("Import Asset"))
+				{
+					if (ImGui::MenuItem("Import from file")) {
+						system("explorer C:\\");
+					}
+					
+					ImGui::EndMenu();
+				}
+				//if (ImGui::BeginMenu("Edit"))
+				//{
+				//	if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				//	if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+				//	ImGui::Separator();
+				//	if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				//	if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				//	if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				//	ImGui::EndMenu();
+				//}
+				ImGui::EndMainMenuBar();
+			}
+		}
+
+		// scene
+		{
+			ImGui::SetNextWindowPos(ImVec2(0,25));
 
 			ImGuiWindowFlags window_flags =  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
 			ImGui::Begin("EditMode",0,window_flags);
@@ -122,26 +129,52 @@ void Editor::Run()
 			ImGui::End();
 		}
 
+
+		ImGui::ShowDemoWindow();
+
 		// assets 
+		if(1)
 		{
-			ImGui::SetNextWindowPos(ImVec2(10, 650));
-			ImGui::SetNextWindowSize(ImVec2(1750, 380));
+			ImGui::SetNextWindowPos(ImVec2(0, 660));
+			ImGui::SetNextWindowSize(ImVec2(1750, 350));
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
 			ImGui::Begin("Assets", 0, window_flags);
+
+
+			int selected = 0;
+			{
+				
+				//ImGui::SetNextWindowSize(ImVec2(250, 100));
+				ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+				for (int i = 0; i < 100; i++)
+				{
+					char label[128];
+					sprintf(label, "MyObject %d", i);
+					if (ImGui::Selectable(label, selected == i))
+						selected = i;
+				}
+				ImGui::EndChild();
+			}
+
+
 			ImGui::End();
 		}
+		if (0)
 		// inspector 
 		{
-			ImGui::SetNextWindowPos(ImVec2(850, 10));
-			ImGui::SetNextWindowSize(ImVec2(400, 630));
+			ImGui::SetNextWindowPos(ImVec2(830, 10));
+			ImGui::SetNextWindowSize(ImVec2(400, 635));
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
 			ImGui::Begin("Inspector", 0, window_flags);
 			ImGui::End();
 		}
 		
-		// infos
+		// scene properties
+		if (0)
 		{
-			ImGui::Begin("infos");
+			ImGui::Begin("menu");
+			ImGui::Text("main camera");
+			//ImGui::DragFloat3();
 			ImGui::End();
 		}
 		ImGui::Render();

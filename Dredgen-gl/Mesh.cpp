@@ -12,7 +12,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vec
 }
 
 void Mesh::Draw(Shader& shader)
-
 {
 	// bind appropriate textures
 	uint32_t diffuseNr = 1;
@@ -48,6 +47,11 @@ void Mesh::Draw(Shader& shader)
 	// always good practice to set everything back to defaults once configured.
 	glActiveTexture(GL_TEXTURE0);
 
+}
+
+glm::mat4 Mesh::GetModelMat()
+{
+	return model_mat;
 }
 
 void Mesh::setupMesh()

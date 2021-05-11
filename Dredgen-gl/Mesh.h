@@ -15,22 +15,28 @@ struct Texture {
     std::string path;
 };
 
+struct Transform {
+	glm::vec3 pos = glm::vec3(0.0); // described as xyz
+	glm::vec3 rot = glm::vec3(0.0); // rotate by x/y/z 0-90 
+	glm::vec3 scale = glm::vec3(1.0);
+};
+
 class Mesh {
 public:
-    // mesh Data
+    Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
+    void Draw(Shader& shader);
+    glm::mat4 GetModelMat();
+private:
+    void setupMesh();
+public:
+    //glm::vec3 translation;
+    glm::mat4 model_mat=glm::mat4(1.0);
 	std::vector<Vertex>       vertices;
 	std::vector<uint32_t> indices;
 	std::vector<Texture>      textures;
-    uint32_t VAO;
-
-    Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
-
-    void Draw(Shader& shader);
-
+	uint32_t VAO;
+    std::string meshname;
 private:
-    // render data 
     uint32_t VBO, EBO;
 
-    // initializes all the buffer objects/arrays
-    void setupMesh();
 };

@@ -32,26 +32,17 @@ void RenderEngine::Render()
 	
 	
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	auto modelshader = shaders["model"];
+	auto modelshader = shaders["modelshader"];
 	modelshader.use();
-
-	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 projection = glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f);
 	glm::mat4 view = main_cam->GetViewMatrix();
 	modelshader.setMat4("projection", projection);
 	modelshader.setMat4("view", view);
 
-	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-	//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-	
 	for (auto object : scene) {
-		modelshader.setMat4("model", model);
 		object.second.Draw(modelshader);
 	}
-	//auto backpack = scene["backpack"];
-	//backpack.Draw(modelshader);
 
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
 	// clear all relevant buffers
@@ -82,7 +73,7 @@ void RenderEngine::Initglad()
 void RenderEngine::Init()
 {
 	// camera
-	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
 	
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, width, height);
@@ -109,12 +100,17 @@ void RenderEngine::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	shaders.insert({ "model", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
-	//scene.insert({ "backpack", Model("../resources/models/backpack/backpack.obj") });
-	//scene.insert({ "helmet", Model("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
+	shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
+	scene.insert({ "helmet", Model("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
 	scene.insert({ "helmet2", Model("../resources/models/FlightHelmet/FlightHelmet.gltf") });
+	scene.insert({ "cerberus", Model("../resources/models/cerberus/scene.gltf") });
+	
+	scene["cerberus"].transform.pos = glm::vec3(2.0, 0.0, 0.0);
+	scene["cerberus"].transform.scale = glm::vec3(0.03, 0.03, 0.03);
 
-
+	scene["helmet"].transform.pos = glm::vec3(-3.0, 0.0, 0.0);
+	scene["helmet2"].transform.pos = glm::vec3(0.0, 0.0, 0.0);
+	scene["helmet2"].transform.scale = glm::vec3(5.0, 5.0, 5.0);
 
 	//UI ui;
 }
