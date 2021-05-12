@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 // headers
 #include "RenderEngine.h"
-
+#include "Asset.h"
 class Logger {};
 
 class Inspector {};
@@ -17,6 +17,7 @@ public:
 	}
 	uint32_t GetTexture();
 	void Render();
+	uint32_t RenderAt(std::shared_ptr<Camera> cam);
 	uint32_t width, height;
 	std::unique_ptr<RenderEngine> render_engine{};
 
@@ -39,6 +40,9 @@ private:
 	float lastX=0.0f, lastY=0.0f;
 	float xoffset = 0.0f, yoffset = 0.0f;
 	bool firstMouse = true;
+
+	std::vector<DObject> objects{};
+	std::shared_ptr<Camera> scene_cam{};
 };
 
 

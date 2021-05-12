@@ -11,7 +11,7 @@
 #include "Light.h"
 // headers
 #include "Model.h"
-
+#include "Skybox.h"
 class RenderEngine
 {
 public:
@@ -27,18 +27,27 @@ public:
 	~RenderEngine();
 	void Update();
 	void Render();
+	uint32_t RenderAt(std::shared_ptr<Camera> scene_cam);
 	void Destroy();
 	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
 private:
 	void Initglad();
 	void Init();
+	void InitFBO(uint32_t& fbo, uint32_t& ebo);
 private:
 	uint32_t width{}, height{};
+
+	glm::mat4 projection;
+	glm::mat4 view;
+
 	std::shared_ptr<Camera> main_cam{};
 	std::unordered_map<std::string,Shader> shaders{};
 	std::unordered_map<std::string, Model> scene;
-	uint32_t framebuffer;
-	uint32_t textureColorbuffer;
+
+	uint32_t edit_fbo,edit_tbo;
+	uint32_t render_fbo,render_tbo;
+
+	std::shared_ptr<Skybox> skybox{};
 
 };

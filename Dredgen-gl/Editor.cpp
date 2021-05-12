@@ -3,10 +3,12 @@
 #include <imgui.h>
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <nfd.h>
+#include <array>
 // headers
 #include "Editor.h"
 #include "Log.h"
-
+#include "utils.h"
 
 Editor::Editor(const char* _name, uint32_t _width, uint32_t _height) : width(_width), height(_height)
 {
@@ -48,6 +50,8 @@ Editor::~Editor()
 
 void Editor::Run()
 {
+	scene_cam = std::make_shared<Camera>(glm::vec3(2.0f, -1.0f, 5.0f));
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -89,76 +93,162 @@ void Editor::Run()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		// menubar
 
+		if(1)
 		{
 			if (ImGui::BeginMainMenuBar())
 			{
 				if (ImGui::BeginMenu("Import Asset"))
 				{
 					if (ImGui::MenuItem("Import from file")) {
-						system("explorer C:\\");
+						nfdchar_t* outPath = NULL;
+						nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outPath);
+
+						// check name/type/dir
+						if (result == NFD_OKAY) {
+
+							std::string objectname = "Object "+std::to_string(objects.size());
+							std::string dir(outPath);
+							free(outPath);
+							std::string suffix_str = dir.substr(dir.find_last_of('.') + 1);//获取文件后缀
+							
+							ObjectType type;
+							if (suffix_str == "gltf") {
+								type = ObjectType::model_gltf;
+							}
+							else if (suffix_str=="obj") {
+								type = ObjectType::model_obj;
+							}
+							else if (suffix_str == "fbx") {
+								type = ObjectType::model_fbx;
+							}
+							else if (suffix_str == "jpg" ||suffix_str=="jpeg" ) {
+								type = ObjectType::texture_jpg;
+							}
+							else if (suffix_str == "png") {
+								type = ObjectType::texture_png;
+							}
+							else if (suffix_str == "bmp") {
+								type = ObjectType::texture_bmp;
+							}
+							else if (suffix_str == "tga") {
+								type = ObjectType::texture_tga;
+							}
+							else if (suffix_str == "psd") {
+								type = ObjectType::texture_psd;
+							}
+							else {
+								type = ObjectType::none_type;
+							}
+							if(type!=ObjectType::none_type)
+								objects.push_back(DObject{ objectname,dir,type });
+
+
+						}
+						else if (result == NFD_CANCEL) {
+						}
+						else {
+							Log::Log("Error:", NFD_GetError(),"\n");
+						}
+						//ShellExecute(NULL, "open", "C:", NULL, NULL, SW_SHOWDEFAULT);
 					}
 					
 					ImGui::EndMenu();
 				}
-				//if (ImGui::BeginMenu("Edit"))
-				//{
-				//	if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-				//	if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-				//	ImGui::Separator();
-				//	if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-				//	if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-				//	if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-				//	ImGui::EndMenu();
-				//}
 				ImGui::EndMainMenuBar();
 			}
 		}
 
-		// scene
+		// editmode
 		{
 			ImGui::SetNextWindowPos(ImVec2(0,25));
 
-			ImGuiWindowFlags window_flags =  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
+			ImGuiWindowFlags window_flags =  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar| ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("EditMode",0,window_flags);
-			ImGui::BeginChild(" ");
 			edit_mode->Render();
 			auto tex = edit_mode->GetTexture();
 			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
-			ImGui::EndChild();
 			ImGui::End();
 		}
+		// rendermode
+		if(1)
+		{
+			ImGui::SetNextWindowPos(ImVec2(815, 25));
 
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
+			ImGui::Begin("RenderMode", 0, window_flags);
+
+			auto tex = edit_mode->RenderAt(scene_cam);
+			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
+
+			ImGui::End();
+		}
 
 		ImGui::ShowDemoWindow();
 
 		// assets 
 		if(1)
 		{
-			ImGui::SetNextWindowPos(ImVec2(0, 660));
-			ImGui::SetNextWindowSize(ImVec2(1750, 350));
+			ImGui::SetNextWindowPos(ImVec2(0, 665));
+			ImGui::SetNextWindowSize(ImVec2(815, 330));
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
 			ImGui::Begin("Assets", 0, window_flags);
 
 
-			int selected = 0;
+			static int selected = -1;
 			{
 				
-				//ImGui::SetNextWindowSize(ImVec2(250, 100));
-				ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-				for (int i = 0; i < 100; i++)
+				ImGui::BeginChild("left pane", ImVec2(300, 0), true);
+				for (int i = 0; i < objects.size(); i++)
 				{
 					char label[128];
-					sprintf(label, "MyObject %d", i);
+					//sprintf("%s",objects[i].directory.c_str());
+					sprintf(label, "%s", objects[i].name.c_str());
 					if (ImGui::Selectable(label, selected == i))
 						selected = i;
 				}
 				ImGui::EndChild();
 			}
 
+			ImGui::SameLine();
+			if (selected != -1)
+			{
+				ImGui::BeginGroup();
+				ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+				ImGui::Text("Object %d", selected);
+				ImGui::Separator();
+				if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+				{
+					if (ImGui::BeginTabItem("Description"))
+					{
+						ImGui::TextWrapped("");
+						//std::cout << selected;
+
+						ImGui::Text("name: %s", objects[selected].name.c_str());
+						ImGui::Text("type: %s", objects[selected].GetTypeStr().c_str());
+						ImGui::Text("directory: %s", objects[selected].directory.c_str());
+						ImGui::EndTabItem();
+					}
+					if (ImGui::BeginTabItem("Attributes"))
+					{
+						//if(objects[selected].)
+						//ImGui::Text("Transform");
+						ImGui::EndTabItem();
+					}
+					ImGui::EndTabBar();
+				}
+				ImGui::EndChild();
+				if (ImGui::Button("Revert")) {}
+				ImGui::SameLine();
+				if (ImGui::Button("Save")) {}
+				ImGui::EndGroup();
+			}
+
 
 			ImGui::End();
 		}
+
 		if (0)
 		// inspector 
 		{
@@ -170,11 +260,16 @@ void Editor::Run()
 		}
 		
 		// scene properties
-		if (0)
+		if (1)
 		{
-			ImGui::Begin("menu");
-			ImGui::Text("main camera");
-			//ImGui::DragFloat3();
+			ImGui::Begin("Infos");
+			//ImGui::Text("main camera");
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Text("cursor pos: %.3f %.3f", io.MousePos.x, io.MousePos.y);
+
+			std::array<float, 3> cam_pos{ scene_cam->Position[0],scene_cam->Position[1] ,scene_cam->Position[2]};
+			ImGui::SliderFloat3("cam pos", cam_pos.data(),-10.0f,10.0f);
+			scene_cam->Position = glm::vec3{ cam_pos[0],cam_pos[1],cam_pos[2] };
 			ImGui::End();
 		}
 		ImGui::Render();
@@ -225,5 +320,11 @@ uint32_t EditMode::GetTexture()
 
 void EditMode::Render()
 {
+	render_engine->Update();
 	render_engine->Render();
+}
+
+uint32_t EditMode::RenderAt(std::shared_ptr<Camera> cam)
+{
+	return render_engine->RenderAt(cam);
 }

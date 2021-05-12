@@ -12,10 +12,17 @@ Model::Model(std::string const& path, bool gamma)
 	loadModel(path);
 }
 
+void Model::ReleaseBuffer()
+{
+	for (auto& i : meshes) {
+		//i.ReleaseBuffer();
+	}
+}
+
 // draws the model, and thus all its meshes
 void Model::Draw(Shader& shader)
 {
-	
+
 	for (uint32_t i = 0; i < meshes.size(); i++) {
 		glm::mat4 model_mat = GetModelMat() * meshes[i].GetModelMat();
 		shader.setMat4("model1", model_mat);
@@ -42,6 +49,7 @@ void Model::loadModel(std::string const& path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
+
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene)
@@ -64,7 +72,6 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 	{
 		processNode(node->mChildren[i], scene);
 	}
-
 
 }
 

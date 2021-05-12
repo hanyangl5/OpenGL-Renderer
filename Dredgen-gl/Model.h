@@ -25,6 +25,7 @@ public:
     // model data 
     Model() = default;
     Model(std::string const& path, bool gamma = false);
+    void ReleaseBuffer();
     void Draw(Shader& shader);
     glm::mat4 GetModelMat();
 private:

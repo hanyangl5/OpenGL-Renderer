@@ -11,6 +11,13 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vec
 	setupMesh();
 }
 
+void Mesh::ReleaseBuffer()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+}
+
 void Mesh::Draw(Shader& shader)
 {
 	// bind appropriate textures

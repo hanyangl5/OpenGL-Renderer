@@ -24,6 +24,7 @@ struct Transform {
 class Mesh {
 public:
     Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
+    void ReleaseBuffer();
     void Draw(Shader& shader);
     glm::mat4 GetModelMat();
 private:
@@ -34,9 +35,9 @@ public:
 	std::vector<Vertex>       vertices;
 	std::vector<uint32_t> indices;
 	std::vector<Texture>      textures;
-	uint32_t VAO;
+    uint32_t VAO{};
     std::string meshname;
 private:
-    uint32_t VBO, EBO;
+    uint32_t VBO{}, EBO{};
 
 };
