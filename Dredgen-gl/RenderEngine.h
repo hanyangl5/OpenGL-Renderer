@@ -31,10 +31,12 @@ public:
 	void Destroy();
 	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
+	void AddModel(std::string name,std::string path);
 private:
 	void Initglad();
 	void Init();
 	void InitFBO(uint32_t& fbo, uint32_t& ebo);
+	void InitUBO();
 private:
 	uint32_t width{}, height{};
 
@@ -44,10 +46,12 @@ private:
 	std::shared_ptr<Camera> main_cam{};
 	std::unordered_map<std::string,Shader> shaders{};
 	std::unordered_map<std::string, Model> scene;
-
+	std::vector<std::shared_ptr<Light>> light;
 	uint32_t edit_fbo,edit_tbo;
 	uint32_t render_fbo,render_tbo;
 
 	std::shared_ptr<Skybox> skybox{};
+
+	uint32_t ubo_light;
 
 };

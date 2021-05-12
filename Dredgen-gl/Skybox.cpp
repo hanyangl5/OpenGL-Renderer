@@ -7,7 +7,7 @@
 #include "Log.h"
 Skybox::Skybox(std::string dirpath)
 {
-	float skyboxVertices[] = {
+	std::array<float,108> skyboxVertices{
 		// positions          
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -58,13 +58,10 @@ Skybox::Skybox(std::string dirpath)
 	glGenBuffers(1, &skybox_vbo);
 	glBindVertexArray(skybox_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skyboxVertices.size(), skyboxVertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-
-
-	
 	std::array<std::string, 6> faces
 	{
 		std::string{dirpath+"/posx.jpg"},

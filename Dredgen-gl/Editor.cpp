@@ -111,7 +111,7 @@ void Editor::Run()
 							std::string objectname = "Object "+std::to_string(objects.size());
 							std::string dir(outPath);
 							free(outPath);
-							std::string suffix_str = dir.substr(dir.find_last_of('.') + 1);//获取文件后缀
+							std::string suffix_str = dir.substr(dir.find_last_of('.') + 1);
 							
 							ObjectType type;
 							if (suffix_str == "gltf") {
@@ -239,23 +239,15 @@ void Editor::Run()
 					ImGui::EndTabBar();
 				}
 				ImGui::EndChild();
-				if (ImGui::Button("Revert")) {}
+				if (ImGui::Button("add to scene")) {
+					edit_mode->AddModel(objects[selected].name, objects[selected].directory);
+				}
 				ImGui::SameLine();
 				if (ImGui::Button("Save")) {}
 				ImGui::EndGroup();
 			}
 
 
-			ImGui::End();
-		}
-
-		if (0)
-		// inspector 
-		{
-			ImGui::SetNextWindowPos(ImVec2(830, 10));
-			ImGui::SetNextWindowSize(ImVec2(400, 635));
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
-			ImGui::Begin("Inspector", 0, window_flags);
 			ImGui::End();
 		}
 		
@@ -272,6 +264,8 @@ void Editor::Run()
 			scene_cam->Position = glm::vec3{ cam_pos[0],cam_pos[1],cam_pos[2] };
 			ImGui::End();
 		}
+
+
 		ImGui::Render();
 		int display_w, display_h;
 		glfwGetFramebufferSize(base_window, &display_w, &display_h);
@@ -282,8 +276,6 @@ void Editor::Run()
 
 		glfwSwapBuffers(base_window);
 	}
-
-
 
 }
 

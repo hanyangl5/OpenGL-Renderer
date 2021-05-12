@@ -40,6 +40,7 @@ glm::mat4 Model::GetModelMat()
 
 void Model::loadModel(std::string const& path)
 {
+	Log::Log("loading model at:", path, "\n");
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -196,9 +197,10 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
 uint32_t TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
+	std::string dir = directory.substr(0,directory.find_last_of('\\'));
 	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
-
+	filename = dir + '/' + filename;
+	Log::Log(filename, "\n");
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 

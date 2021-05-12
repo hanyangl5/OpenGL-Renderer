@@ -16,7 +16,7 @@ public:
     virtual glm::vec3 GetPos() const = 0;
     virtual LightType GetType() const = 0;
 
-    protected:
+protected:
     glm::vec3 color;
     glm::vec3 pos, dir;
 };

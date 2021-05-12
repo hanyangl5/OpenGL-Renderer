@@ -2,6 +2,7 @@
 #include "RenderEngine.h"
 #include <iostream>
 #include <stb_image.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "Log.h"
 #include <array>
 RenderEngine::RenderEngine(uint32_t _width, uint32_t _height)
@@ -10,8 +11,6 @@ RenderEngine::RenderEngine(uint32_t _width, uint32_t _height)
 	height = _height;
 	Initglad();
 	Init();
-	skybox = std::make_shared<Skybox>("../resources/textures/Indoor");
-
 }
 
 RenderEngine::~RenderEngine()
@@ -23,7 +22,17 @@ void RenderEngine::Update()
 {
 	projection = glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f);
 	view = main_cam->GetViewMatrix();
+	//glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
+	//int type = 0;
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetPos())); //pos
+	//glBufferSubData(GL_UNIFORM_BUFFER, 1*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetDir()));//dir
+	//glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetColor()));// color
+	//glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::vec3)+sizeof(int), sizeof(int), &type); // type
+	////glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	////
+	////glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
 
+	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void RenderEngine::Render()
@@ -105,6 +114,11 @@ uint32_t RenderEngine::GetTexture()
 	return edit_fbo;
 }
 
+void RenderEngine::AddModel(std::string name,std::string path)
+{
+	scene.insert({ name, Model(path) });
+}
+
 void RenderEngine::Initglad()
 {
 
@@ -119,15 +133,17 @@ void RenderEngine::Init()
 {
 	// camera
 	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
+	light.push_back(std::make_shared<DirectLight>(glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+
 
 	InitFBO(edit_fbo, edit_tbo);
 	InitFBO(render_fbo, render_tbo);
 
 
 	shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
-	scene.insert({ "helmet", {"../resources/models/DamagedHelmet/DamagedHelmet.gltf"} });
-	scene.insert({ "helmet2", {"../resources/models/FlightHelmet/FlightHelmet.gltf"} });
-	scene.insert({ "cerberus", Model("../resources/models/cerberus/scene.gltf") });
+	//scene.insert({ "helmet", {"../resources/models/DamagedHelmet/DamagedHelmet.gltf"} });
+	//scene.insert({ "helmet2", {"../resources/models/FlightHelmet/FlightHelmet.gltf"} });
+	//scene.insert({ "cerberus", Model("../resources/models/cerberus/scene.gltf") });
 
 	scene["cerberus"].transform.pos = glm::vec3(2.0, 0.0, 0.0);
 	scene["cerberus"].transform.scale = glm::vec3(0.03, 0.03, 0.03);
@@ -135,9 +151,12 @@ void RenderEngine::Init()
 	scene["helmet"].transform.pos = glm::vec3(-3.0, 0.0, 0.0);
 	scene["helmet2"].transform.pos = glm::vec3(0.0, 0.0, 0.0);
 	scene["helmet2"].transform.scale = glm::vec3(5.0, 5.0, 5.0);
+	
+	//UI ui
 
-
-	//UI ui;
+	skybox = std::make_shared<Skybox>("../resources/textures/Indoor");
+	//InitUBO();
+	;
 }
 
 void RenderEngine::InitFBO(uint32_t& fbo, uint32_t& tbo)
@@ -163,5 +182,17 @@ void RenderEngine::InitFBO(uint32_t& fbo, uint32_t& tbo)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		Log::Log("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RenderEngine::InitUBO()
+{
+
+	uint32_t uniform_block = glGetUniformBlockIndex(shaders["modelshader"].ID, "Light");
+	glUniformBlockBinding(shaders["modelshader"].ID, uniform_block, 0);
+	glGenBuffers(GL_UNIFORM_BUFFER, &ubo_light);
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
+	glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::vec3) + 4, nullptr, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo_light, 0, 3 * sizeof(glm::vec3) + 4);
 }
 

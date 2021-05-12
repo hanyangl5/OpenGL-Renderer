@@ -10,6 +10,14 @@ uniform mat4 model1;
 uniform mat4 view;
 uniform mat4 projection;
 
+// layout (std140) uniform Light
+// {
+//     vec3 pos;
+//     vec3 dir;
+//     vec3 color;
+//     int type;
+// };
+
 void main()
 {
     TexCoords = aTexCoords; 
