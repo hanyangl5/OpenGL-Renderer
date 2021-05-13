@@ -24,6 +24,7 @@ void Model::Draw(Shader& shader)
 {
 
 	for (uint32_t i = 0; i < meshes.size(); i++) {
+		//Log::Log("mat",glm::to_string(GetModelMat()),"\n");
 		glm::mat4 model_mat = GetModelMat() * meshes[i].GetModelMat();
 		shader.setMat4("model1", model_mat);
 		meshes[i].Draw(shader);

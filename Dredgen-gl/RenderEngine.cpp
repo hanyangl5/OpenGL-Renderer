@@ -5,6 +5,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Log.h"
 #include <array>
+
+#include <imgui.h>
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 RenderEngine::RenderEngine(uint32_t _width, uint32_t _height)
 {
 	width = _width;
@@ -31,6 +36,7 @@ void RenderEngine::Update()
 	////glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	////
 	////glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
+
 
 	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
@@ -102,6 +108,55 @@ uint32_t RenderEngine::RenderAt(std::shared_ptr<Camera> scene_cam)
 	return render_fbo;
 }
 
+void RenderEngine::GetSceneStat(){
+
+			//ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
+			ImGui::Begin("scene");
+
+
+			static int s_selected = -1;
+			int index = 0;
+			static std::string k;
+			{
+				ImGui::BeginChild("left pane", ImVec2(300, 0), true);
+				//int index = 0;
+				for(auto &i:scene){
+					char label[128];
+					//sprintf("%s",objects[i].directory.c_str());
+					sprintf(label, "%s", i.first.c_str());
+					if (ImGui::Selectable(label, s_selected == index)){
+						s_selected = index;
+						k = i.first.c_str();
+						std::cout << k;
+					}
+					index++;
+				};
+				ImGui::EndChild();
+			}
+
+			ImGui::SameLine();
+			if (s_selected != -1&& !k.empty())
+			{
+				ImGui::BeginGroup();
+				ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+				ImGui::Text("Object %d", s_selected);
+				if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+				{
+					if (ImGui::BeginTabItem("Transform"))
+					{
+						ImGui::InputFloat3("position", glm::value_ptr(scene.at(k).transform.pos));
+						ImGui::InputFloat3("rotation", glm::value_ptr(scene[k].transform.rot));
+						ImGui::InputFloat3("scale", glm::value_ptr(scene[k].transform.scale));
+						ImGui::EndTabItem();
+					}
+					ImGui::EndTabBar();
+				}
+				ImGui::EndChild();
+				ImGui::EndGroup();
+			}
+
+			ImGui::End();
+}
 void RenderEngine::Destroy()
 {
 	for (auto i : scene) {
@@ -141,17 +196,8 @@ void RenderEngine::Init()
 
 
 	shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
-	//scene.insert({ "helmet", {"../resources/models/DamagedHelmet/DamagedHelmet.gltf"} });
-	//scene.insert({ "helmet2", {"../resources/models/FlightHelmet/FlightHelmet.gltf"} });
-	//scene.insert({ "cerberus", Model("../resources/models/cerberus/scene.gltf") });
+	//shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","../resources/shaders/modelgs.glsl") });
 
-	scene["cerberus"].transform.pos = glm::vec3(2.0, 0.0, 0.0);
-	scene["cerberus"].transform.scale = glm::vec3(0.03, 0.03, 0.03);
-
-	scene["helmet"].transform.pos = glm::vec3(-3.0, 0.0, 0.0);
-	scene["helmet2"].transform.pos = glm::vec3(0.0, 0.0, 0.0);
-	scene["helmet2"].transform.scale = glm::vec3(5.0, 5.0, 5.0);
-	
 	//UI ui
 
 	skybox = std::make_shared<Skybox>("../resources/textures/Indoor");
@@ -187,12 +233,20 @@ void RenderEngine::InitFBO(uint32_t& fbo, uint32_t& tbo)
 void RenderEngine::InitUBO()
 {
 
+	struct ubo
+	{
+		glm::vec3 pos;
+		glm::vec3 dir;
+		glm::vec3 color;
+		int type;
+	};
+	Log::Log(sizeof(ubo), "\n");
 	uint32_t uniform_block = glGetUniformBlockIndex(shaders["modelshader"].ID, "Light");
 	glUniformBlockBinding(shaders["modelshader"].ID, uniform_block, 0);
 	glGenBuffers(GL_UNIFORM_BUFFER, &ubo_light);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
-	glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::vec3) + 4, nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ubo), nullptr, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo_light, 0, 3 * sizeof(glm::vec3) + 4);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo_light, 0, sizeof(ubo));
 }
 

@@ -32,6 +32,8 @@ public:
 	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
 	void AddModel(std::string name,std::string path);
+	void GetSceneStat();
+
 private:
 	void Initglad();
 	void Init();

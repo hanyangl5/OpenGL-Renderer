@@ -17,10 +17,8 @@ public:
 	}
 	uint32_t GetTexture();
 	void Render();
-	void AddModel(std::string name, std::string path)
-	{
-		render_engine->AddModel(name, path);
-	}
+	void AddModel(std::string name, std::string path);
+	void GetSceneStat();
 	uint32_t RenderAt(std::shared_ptr<Camera> cam);
 	uint32_t width, height;
 	std::unique_ptr<RenderEngine> render_engine{};
@@ -46,6 +44,7 @@ private:
 	bool firstMouse = true;
 
 	std::vector<DObject> objects{};
+	std::vector<bool> added{};
 	std::shared_ptr<Camera> scene_cam{};
 };
 

@@ -110,6 +110,7 @@ Skybox::~Skybox()
 
 void Skybox::Draw(glm::mat4 projmat, glm::mat3 viewmat)
 {
+	// depth test will not discard the pixel z=1.0
 	glDepthFunc(GL_LEQUAL);
 	skyboxshader->use();
 	skyboxshader->setMat4("view", viewmat);

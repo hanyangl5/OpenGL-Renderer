@@ -20,7 +20,7 @@ Editor::Editor(const char* _name, uint32_t _width, uint32_t _height) : width(_wi
 		Log::Log("failed to init glfw");
 	};
 
-	
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	base_window = glfwCreateWindow(width, height, "Dredgen-gl", nullptr, nullptr);
@@ -55,7 +55,7 @@ void Editor::Run()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	
+
 	ImGui::StyleColorsLight();
 	io.Fonts->AddFontFromFileTTF("../resources/fonts/Consolas.ttf", 17);
 	const char* glsl_version = "#version 130";
@@ -95,7 +95,7 @@ void Editor::Run()
 		ImGui::NewFrame();
 		// menubar
 
-		if(1)
+		if (1)
 		{
 			if (ImGui::BeginMainMenuBar())
 			{
@@ -108,22 +108,22 @@ void Editor::Run()
 						// check name/type/dir
 						if (result == NFD_OKAY) {
 
-							std::string objectname = "Object "+std::to_string(objects.size());
+							std::string objectname = "Object " + std::to_string(objects.size());
 							std::string dir(outPath);
 							free(outPath);
 							std::string suffix_str = dir.substr(dir.find_last_of('.') + 1);
-							
+
 							ObjectType type;
 							if (suffix_str == "gltf") {
 								type = ObjectType::model_gltf;
 							}
-							else if (suffix_str=="obj") {
+							else if (suffix_str == "obj") {
 								type = ObjectType::model_obj;
 							}
 							else if (suffix_str == "fbx") {
 								type = ObjectType::model_fbx;
 							}
-							else if (suffix_str == "jpg" ||suffix_str=="jpeg" ) {
+							else if (suffix_str == "jpg" || suffix_str == "jpeg") {
 								type = ObjectType::texture_jpg;
 							}
 							else if (suffix_str == "png") {
@@ -141,19 +141,22 @@ void Editor::Run()
 							else {
 								type = ObjectType::none_type;
 							}
-							if(type!=ObjectType::none_type)
+							if (type != ObjectType::none_type) {
 								objects.push_back(DObject{ objectname,dir,type });
+								added.push_back(false);
+							}
+
 
 
 						}
 						else if (result == NFD_CANCEL) {
 						}
 						else {
-							Log::Log("Error:", NFD_GetError(),"\n");
+							Log::Log("Error:", NFD_GetError(), "\n");
 						}
 						//ShellExecute(NULL, "open", "C:", NULL, NULL, SW_SHOWDEFAULT);
 					}
-					
+
 					ImGui::EndMenu();
 				}
 				ImGui::EndMainMenuBar();
@@ -162,17 +165,17 @@ void Editor::Run()
 
 		// editmode
 		{
-			ImGui::SetNextWindowPos(ImVec2(0,25));
+			ImGui::SetNextWindowPos(ImVec2(0, 25));
 
-			ImGuiWindowFlags window_flags =  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar| ImGuiWindowFlags_AlwaysAutoResize;
-			ImGui::Begin("EditMode",0,window_flags);
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
+			ImGui::Begin("EditMode", 0, window_flags);
 			edit_mode->Render();
 			auto tex = edit_mode->GetTexture();
 			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 		}
 		// rendermode
-		if(1)
+		if (1)
 		{
 			ImGui::SetNextWindowPos(ImVec2(815, 25));
 
@@ -188,7 +191,7 @@ void Editor::Run()
 		ImGui::ShowDemoWindow();
 
 		// assets 
-		if(1)
+		if (1)
 		{
 			ImGui::SetNextWindowPos(ImVec2(0, 665));
 			ImGui::SetNextWindowSize(ImVec2(815, 330));
@@ -198,7 +201,7 @@ void Editor::Run()
 
 			static int selected = -1;
 			{
-				
+
 				ImGui::BeginChild("left pane", ImVec2(300, 0), true);
 				for (int i = 0; i < objects.size(); i++)
 				{
@@ -230,27 +233,18 @@ void Editor::Run()
 						ImGui::Text("directory: %s", objects[selected].directory.c_str());
 						ImGui::EndTabItem();
 					}
-					if (ImGui::BeginTabItem("Attributes"))
-					{
-						//if(objects[selected].)
-						//ImGui::Text("Transform");
-						ImGui::EndTabItem();
-					}
 					ImGui::EndTabBar();
 				}
 				ImGui::EndChild();
-				if (ImGui::Button("add to scene")) {
-					edit_mode->AddModel(objects[selected].name, objects[selected].directory);
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Save")) {}
+				if (selected != -1)
+					if ((added[selected] == false) && ImGui::Button("add to scene")) {
+						edit_mode->AddModel(objects[selected].name, objects[selected].directory);
+						added[selected] = true;
+					}
 				ImGui::EndGroup();
 			}
-
-
 			ImGui::End();
 		}
-		
 		// scene properties
 		if (1)
 		{
@@ -259,10 +253,13 @@ void Editor::Run()
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::Text("cursor pos: %.3f %.3f", io.MousePos.x, io.MousePos.y);
 
-			std::array<float, 3> cam_pos{ scene_cam->Position[0],scene_cam->Position[1] ,scene_cam->Position[2]};
-			ImGui::SliderFloat3("cam pos", cam_pos.data(),-10.0f,10.0f);
+			std::array<float, 3> cam_pos{ scene_cam->Position[0],scene_cam->Position[1] ,scene_cam->Position[2] };
+			ImGui::SliderFloat3("cam pos", cam_pos.data(), -10.0f, 10.0f);
 			scene_cam->Position = glm::vec3{ cam_pos[0],cam_pos[1],cam_pos[2] };
 			ImGui::End();
+		}
+		if (1) {
+			edit_mode->GetSceneStat();
 		}
 
 
@@ -283,9 +280,9 @@ void Editor::Run()
 void Editor::processInput(GLFWwindow* window)
 {
 
-	float delta_time=ImGui::GetIO().Framerate/3000.0f;
+	float delta_time = ImGui::GetIO().Framerate / 3000.0f;
 	// drag with right mouse button 
-	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
 		edit_mode->render_engine->GetCam()->ProcessMouseMovement(xoffset, yoffset);
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -314,6 +311,16 @@ void EditMode::Render()
 {
 	render_engine->Update();
 	render_engine->Render();
+}
+
+void EditMode::AddModel(std::string name, std::string path)
+{
+	render_engine->AddModel(name, path);
+}
+
+void EditMode::GetSceneStat()
+{
+	render_engine->GetSceneStat();
 }
 
 uint32_t EditMode::RenderAt(std::shared_ptr<Camera> cam)
