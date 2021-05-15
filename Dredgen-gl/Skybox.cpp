@@ -86,7 +86,7 @@ Skybox::Skybox(std::string dirpath)
 		}
 		else
 		{
-			Log::Log("Cubemap texture failed to load at path:", faces[i], "\n");
+			Log::Log("Cubemap texture failed to load at path:", faces[i]);
 
 			stbi_image_free(data);
 		}
@@ -113,8 +113,7 @@ void Skybox::Draw(glm::mat4 projmat, glm::mat3 viewmat)
 	// depth test will not discard the pixel z=1.0
 	glDepthFunc(GL_LEQUAL);
 	skyboxshader->use();
-	skyboxshader->setMat4("view", viewmat);
-	skyboxshader->setMat4("projection", projmat);
+	skyboxshader->setMat4("vp", projmat*glm::mat4(viewmat));
 	glBindVertexArray(skybox_vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_texture);

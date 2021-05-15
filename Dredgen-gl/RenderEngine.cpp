@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stb_image.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include "Log.h"
 #include <array>
 
@@ -27,22 +28,22 @@ void RenderEngine::Update()
 {
 	projection = glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f);
 	view = main_cam->GetViewMatrix();
-	//glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
-	//int type = 0;
-	//glBufferSubData(GL_UNIFORM_BUFFER, 0*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetPos())); //pos
-	//glBufferSubData(GL_UNIFORM_BUFFER, 1*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetDir()));//dir
-	//glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::vec3), sizeof(glm::vec3), glm::value_ptr(light[0]->GetColor()));// color
-	//glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::vec3)+sizeof(int), sizeof(int), &type); // type
-	////glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	////
-	////glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
+	int type = 0;
+	//std::cout<<sizeof(glm::vec3);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(light[0]->GetPos())); //pos
+	//std::cout << glm::to_string(light[0]->GetColor());
+	glBufferSubData(GL_UNIFORM_BUFFER, 16, sizeof(glm::vec3), glm::value_ptr(light[0]->GetDir()));//dir
+	glBufferSubData(GL_UNIFORM_BUFFER, 32, sizeof(glm::vec3), glm::value_ptr(light[0]->GetColor()));// color
+	glBufferSubData(GL_UNIFORM_BUFFER, 48, sizeof(int), &type); // type
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-
-	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void RenderEngine::Render()
 {
+
+	shadowpass->Draw(scene);
 	glViewport(0, 0, width, height);
 	glBindFramebuffer(GL_FRAMEBUFFER, edit_fbo);
 	glBindTexture(GL_TEXTURE_2D, edit_tbo);
@@ -52,24 +53,24 @@ void RenderEngine::Render()
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	
 	auto modelshader = shaders["modelshader"];
-	modelshader.use();
+	modelshader->use();
+	modelshader->setMat4("projection", projection);
+	modelshader->setMat4("view", view);
 
-	modelshader.setMat4("projection", projection);
-	modelshader.setMat4("view", view);
-
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowpass->GetShadowTex());
 	for (auto object : scene) {
-		object.second.Draw(modelshader);
+		object.second->Draw(*modelshader.get(), object.second->rendermode);
 	}
 
 	skybox->Draw(projection, glm::mat3(view));
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-	// clear all relevant buffers
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -87,81 +88,86 @@ uint32_t RenderEngine::RenderAt(std::shared_ptr<Camera> scene_cam)
 
 	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	auto modelshader = shaders["modelshader"];
-	modelshader.use();
-
-	modelshader.setMat4("projection", projection);
-	modelshader.setMat4("view", scene_cam->GetViewMatrix());
-
+	modelshader->use();
+	modelshader->setMat4("projection", projection);
+	modelshader->setMat4("view", scene_cam->GetViewMatrix());
+	modelshader->setVec3("eyepos", main_cam->Position);
 	for (auto object : scene) {
-		object.second.Draw(modelshader);
+		object.second->Draw(*modelshader.get(), object.second->rendermode);
 	}
 
 	skybox->Draw(projection, glm::mat3(scene_cam->GetViewMatrix()));
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-	// clear all relevant buffers
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	return render_fbo;
 }
 
-void RenderEngine::GetSceneStat(){
+void RenderEngine::GetSceneStat() {
 
-			//ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
-			ImGui::Begin("scene");
-
-
-			static int s_selected = -1;
-			int index = 0;
-			static std::string k;
-			{
-				ImGui::BeginChild("left pane", ImVec2(300, 0), true);
-				//int index = 0;
-				for(auto &i:scene){
-					char label[128];
-					//sprintf("%s",objects[i].directory.c_str());
-					sprintf(label, "%s", i.first.c_str());
-					if (ImGui::Selectable(label, s_selected == index)){
-						s_selected = index;
-						k = i.first.c_str();
-						std::cout << k;
-					}
-					index++;
-				};
-				ImGui::EndChild();
+	//ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
+	ImGui::Begin("scene");
+	static int s_selected = -1;
+	int index = 0;
+	static std::string k;
+	{
+		ImGui::BeginChild("left pane", ImVec2(300, 0), true);
+		//int index = 0;
+		for (auto& i : scene) {
+			char label[128];
+			//sprintf("%s",objects[i].directory.c_str());
+			sprintf(label, "%s", i.first.c_str());
+			if (ImGui::Selectable(label, s_selected == index)) {
+				s_selected = index;
+				k = i.first.c_str();
+				std::cout << k;
 			}
+			index++;
+		};
+		ImGui::EndChild();
+	}
 
-			ImGui::SameLine();
-			if (s_selected != -1&& !k.empty())
+	ImGui::SameLine();
+	if (s_selected != -1 && !k.empty())
+	{
+		ImGui::BeginGroup();
+		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		ImGui::Text("Object %d", s_selected);
+		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		{
+			if (ImGui::BeginTabItem("Transform"))
 			{
-				ImGui::BeginGroup();
-				ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-				ImGui::Text("Object %d", s_selected);
-				if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
-				{
-					if (ImGui::BeginTabItem("Transform"))
-					{
-						ImGui::InputFloat3("position", glm::value_ptr(scene.at(k).transform.pos));
-						ImGui::InputFloat3("rotation", glm::value_ptr(scene[k].transform.rot));
-						ImGui::InputFloat3("scale", glm::value_ptr(scene[k].transform.scale));
-						ImGui::EndTabItem();
-					}
-					ImGui::EndTabBar();
-				}
-				ImGui::EndChild();
-				ImGui::EndGroup();
+				auto& chosen_obj = scene.at(k);
+				ImGui::InputFloat3("position", glm::value_ptr(chosen_obj->transform.pos));
+				ImGui::SliderFloat3("rotation", glm::value_ptr(chosen_obj->transform.rot), 0.0, 360);
+				ImGui::SliderFloat3("scale", glm::value_ptr(chosen_obj->transform.scale), 0.01, 5.0);
+				//int* a = ;
+				//ImGui::InputInt("rendermode", reinterpret_cast<int*>(&chosen_obj.rendermode));
+				//std::cout << chosen_obj.rendermode<<"\n";
 			}
+			ImGui::EndTabBar();
+		}
+		ImGui::EndChild();
+		if (ImGui::Button("remove")) {
+			//auto iter = scene.find(k);
+			//if (iter != scene.end()) {
+			//	scene.erase(iter);
+			//}
+		}
+		ImGui::EndGroup();
 
-			ImGui::End();
+
+	}
+
+	ImGui::End();
 }
 void RenderEngine::Destroy()
 {
-	for (auto i : scene) {
-		i.second.ReleaseBuffer();
-	}
+
 }
 
 uint32_t RenderEngine::GetTexture()
@@ -169,9 +175,9 @@ uint32_t RenderEngine::GetTexture()
 	return edit_fbo;
 }
 
-void RenderEngine::AddModel(std::string name,std::string path)
+void RenderEngine::AddModel(std::string name, std::string path)
 {
-	scene.insert({ name, Model(path) });
+	scene.insert({ name, std::make_shared<Model>(path) });
 }
 
 void RenderEngine::Initglad()
@@ -188,21 +194,21 @@ void RenderEngine::Init()
 {
 	// camera
 	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
-	light.push_back(std::make_shared<DirectLight>(glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-
+	light.push_back(std::make_shared<DirectLight>(glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, -1.0, 0.)));
+	shadowpass = std::make_shared<Shadowpass>(light[0]);
 
 	InitFBO(edit_fbo, edit_tbo);
 	InitFBO(render_fbo, render_tbo);
 
+	shaders.insert({ "modelshader", std::make_shared<Shader>("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl") });
+	InitUBO(shaders.at("modelshader"));
 
-	shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","") });
-	//shaders.insert({ "modelshader", Shader("../resources/shaders/modelvs.glsl", "../resources/shaders/modelps.glsl","../resources/shaders/modelgs.glsl") });
-
-	//UI ui
-
-	skybox = std::make_shared<Skybox>("../resources/textures/Indoor");
-	//InitUBO();
-	;
+	skybox = std::make_shared<Skybox>("../resources/textures/GraceCathedral");
+	//scene.insert({ "plane", std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf") });
+	scene.insert({ "helmet", std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
+	scene.insert({ "sponza", std::make_shared<Model>("../resources/models/Sponza/glTF/Sponza.gltf") });
+	//scene.at("plane")->transform.scale = glm::vec3(10.0, 0.1, 10.0);
+	//scene.at("plane")->transform.pos = glm::vec3(0.0, -2.0, 0.0);
 }
 
 void RenderEngine::InitFBO(uint32_t& fbo, uint32_t& tbo)
@@ -230,23 +236,17 @@ void RenderEngine::InitFBO(uint32_t& fbo, uint32_t& tbo)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderEngine::InitUBO()
+void RenderEngine::InitUBO(std::shared_ptr<Shader> shader)
 {
-
-	struct ubo
-	{
-		glm::vec3 pos;
-		glm::vec3 dir;
-		glm::vec3 color;
-		int type;
-	};
-	Log::Log(sizeof(ubo), "\n");
-	uint32_t uniform_block = glGetUniformBlockIndex(shaders["modelshader"].ID, "Light");
-	glUniformBlockBinding(shaders["modelshader"].ID, uniform_block, 0);
-	glGenBuffers(GL_UNIFORM_BUFFER, &ubo_light);
+	// generate uniform buffer 
+	glGenBuffers(1, &ubo_light);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo_light);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ubo), nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 52, NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo_light, 0, sizeof(ubo));
+	uniform_block= glGetUniformBlockIndex(shader->Program, "Light");
+	glUniformBlockBinding(shader->Program, uniform_block, 0);
+	std::cout << uniform_block;
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_light);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo_light, 0,52);
 }
 

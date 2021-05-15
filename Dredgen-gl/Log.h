@@ -24,6 +24,8 @@ namespace Log {
 		if (sizeof...(args) != 0)
 			std::cout << " ";
 		Log(args...);
+		if (sizeof...(args) == 0)
+			std::cout << std::endl;
 	}
 
 }

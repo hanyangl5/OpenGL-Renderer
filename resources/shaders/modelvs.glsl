@@ -3,29 +3,19 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
-//layout (location=0) out vec2 TexCoords;
-//layout (location=1) out vec3 view_normal;
-
 layout (location=0) out PS_IN{
     vec2 texcoord;
-    vec3 view_normal;
+    vec3 world_normal;
 }vs_out;
 
-uniform mat4 model1;
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-layout (std140) uniform Light
-{
-    vec3 pos;
-    vec3 dir;
-    vec3 color;
-    int type;
-};
 
 void main()
 {
     vs_out.texcoord=aTexCoords;
-    vs_out.view_normal=vec3( model1 * vec4(aNormal, 1.0));
-    gl_Position = projection * view * model1 * vec4(aPos, 1.0);
+    vs_out.world_normal=vec3( model * vec4(aNormal, 1.0));
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

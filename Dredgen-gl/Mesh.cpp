@@ -18,7 +18,7 @@ void Mesh::ReleaseBuffer()
 	glDeleteBuffers(1, &EBO);
 }
 
-void Mesh::Draw(Shader& shader)
+void Mesh::Draw(Shader& shader, RenderMode renermode)
 {
 	// bind appropriate textures
 	uint32_t diffuseNr = 1;
@@ -41,14 +41,28 @@ void Mesh::Draw(Shader& shader)
 			number = std::to_string(heightNr++); // transfer uint32_t to stream
 
 		// now set the sampler to the correct texture unit
-		glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+		glUniform1i(glGetUniformLocation(shader.Program, (name + number).c_str()), i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
-
+	//glActiveTexture(GL_TEXTURE0+textures.size());
 	// draw mesh
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	switch (renermode)
+	{
+	case Point:
+		glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
+		break;
+	case Triangle:
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		break;
+	case Line:
+		glDrawElements(GL_LINE, indices.size(), GL_UNSIGNED_INT, 0);
+		break;
+	default:
+		break;
+	}
+
 	glBindVertexArray(0);
 
 	// always good practice to set everything back to defaults once configured.

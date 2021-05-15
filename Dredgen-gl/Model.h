@@ -16,7 +16,6 @@
 #include <vector>
 
 
-
 uint32_t TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
 class Model 
@@ -25,8 +24,8 @@ public:
     // model data 
     Model() = default;
     Model(std::string const& path, bool gamma = false);
-    void ReleaseBuffer();
-    void Draw(Shader& shader);
+    ~Model();
+    void Draw(Shader& shader, RenderMode renermode);
     glm::mat4 GetModelMat();
 private:
    void loadModel(std::string const& path);
@@ -36,9 +35,10 @@ private:
 
 public:
 	std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-	std::vector<Mesh>    meshes;
+	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::string directory;
 	bool gammaCorrection;
 	Transform transform;
+    RenderMode rendermode = RenderMode::Triangle;
 };
 

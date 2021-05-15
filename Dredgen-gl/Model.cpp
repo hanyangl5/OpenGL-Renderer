@@ -1,6 +1,7 @@
 #include <glad/glad.h> 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "Model.h"
 #include "Log.h"
@@ -12,22 +13,23 @@ Model::Model(std::string const& path, bool gamma)
 	loadModel(path);
 }
 
-void Model::ReleaseBuffer()
+
+Model::~Model()
 {
 	for (auto& i : meshes) {
-		//i.ReleaseBuffer();
+		i->ReleaseBuffer();
 	}
 }
 
+
 // draws the model, and thus all its meshes
-void Model::Draw(Shader& shader)
+void Model::Draw(Shader& shader, RenderMode renermode)
 {
 
 	for (uint32_t i = 0; i < meshes.size(); i++) {
-		//Log::Log("mat",glm::to_string(GetModelMat()),"\n");
-		glm::mat4 model_mat = GetModelMat() * meshes[i].GetModelMat();
-		shader.setMat4("model1", model_mat);
-		meshes[i].Draw(shader);
+		glm::mat4 model_mat = GetModelMat() * meshes[i]->GetModelMat();
+		shader.setMat4("model", model_mat);
+		meshes[i]->Draw(shader,rendermode);
 	}
 }
 
@@ -35,13 +37,30 @@ glm::mat4 Model::GetModelMat()
 {
 	glm::mat4 ret = glm::mat4(1.0);
 	ret = glm::translate(ret, transform.pos);
+	//
+	if (1) {
+		glm::quat myQuat(glm::radians(transform.rot));
+		glm::mat4 RotationMatrix = glm::toMat4(myQuat);
+		ret = RotationMatrix * ret;
+	}
+	else
+	{
+		//rotate by z y x
+		ret = glm::rotate(ret, glm::radians(transform.rot[1]), glm::vec3(0, 1, 0));
+		ret = glm::rotate(ret, glm::radians(transform.rot[2]), glm::vec3(0, 0, 1));
+		ret = glm::rotate(ret, glm::radians(transform.rot[0]), glm::vec3(1, 0, 0));
+	}
+
+
 	ret = glm::scale(ret, transform.scale);
+
+
 	return ret;
 }
 
 void Model::loadModel(std::string const& path)
 {
-	Log::Log("loading model at:", path, "\n");
+	Log::Log("loading model at:", path);
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -68,7 +87,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 			t.a2, t.b2, t.c2, t.d2,
 			t.a3, t.b3, t.c3, t.d3,
 			t.a4, t.b4, t.c4, t.d4);
-		meshes.push_back(_mesh);
+		meshes.push_back(std::make_shared<Mesh>(_mesh));
 	}
 	for (uint32_t i = 0; i < node->mNumChildren; i++)
 	{
@@ -162,8 +181,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
 }
 
-// checks all material textures of a given type and loads the textures if they're not loaded yet.
-// the required info is returned as a Texture struct.
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
 	std::vector<Texture> textures;
@@ -195,13 +212,12 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 	return textures;
 }
 
-
 uint32_t TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
-	std::string dir = directory.substr(0,directory.find_last_of('\\'));
+	std::string dir = directory.substr(0, directory.find_last_of('\\'));
 	std::string filename = std::string(path);
 	filename = dir + '/' + filename;
-	Log::Log(filename, "\n");
+	Log::Log(filename);
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 

@@ -21,8 +21,8 @@ Editor::Editor(const char* _name, uint32_t _width, uint32_t _height) : width(_wi
 	};
 
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	base_window = glfwCreateWindow(width, height, "Dredgen-gl", nullptr, nullptr);
 
 	if (!base_window)
@@ -152,7 +152,7 @@ void Editor::Run()
 						else if (result == NFD_CANCEL) {
 						}
 						else {
-							Log::Log("Error:", NFD_GetError(), "\n");
+							Log::Log("Error:", NFD_GetError());
 						}
 						//ShellExecute(NULL, "open", "C:", NULL, NULL, SW_SHOWDEFAULT);
 					}
@@ -175,7 +175,7 @@ void Editor::Run()
 			ImGui::End();
 		}
 		// rendermode
-		if (1)
+		if (0)
 		{
 			ImGui::SetNextWindowPos(ImVec2(815, 25));
 
@@ -255,6 +255,7 @@ void Editor::Run()
 
 			std::array<float, 3> cam_pos{ scene_cam->Position[0],scene_cam->Position[1] ,scene_cam->Position[2] };
 			ImGui::SliderFloat3("cam pos", cam_pos.data(), -10.0f, 10.0f);
+			ImGui::InputFloat("edit cam speed", &edit_mode->render_engine->GetCam()->MovementSpeed);
 			scene_cam->Position = glm::vec3{ cam_pos[0],cam_pos[1],cam_pos[2] };
 			ImGui::End();
 		}
@@ -299,7 +300,6 @@ void Editor::processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		edit_mode->render_engine->GetCam()->ProcessKeyboard(Direction::DOWN, delta_time);
 
-	//std::cout << deltaTime<<render_engine->GetCam()->Position.x << " " << render_engine->GetCam()->Position.y << " " << render_engine->GetCam()->Position.z << "\n";
 }
 
 uint32_t EditMode::GetTexture()

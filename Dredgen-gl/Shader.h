@@ -1,14 +1,12 @@
 #pragma  once
 #include <glm/glm.hpp>
 #include <string>
-
+#include <cstdint>
 class Shader
 {
 public:
-    unsigned int ID;
-
     Shader() = default;
-    Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath);
+    Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath = "");
     void use();
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
@@ -22,6 +20,9 @@ public:
     void setMat2(const std::string& name, const glm::mat2& mat) const;
     void setMat3(const std::string& name, const glm::mat3& mat) const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+public:
+    uint32_t Program{};
 private:
     void checkCompileErrors(uint32_t shader, std::string type);
 };
