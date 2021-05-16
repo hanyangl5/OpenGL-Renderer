@@ -217,7 +217,7 @@ uint32_t TextureFromFile(const char* path, const std::string& directory, bool ga
 	std::string dir = directory.substr(0, directory.find_last_of('\\'));
 	std::string filename = std::string(path);
 	filename = dir + '/' + filename;
-	Log::Log(filename);
+	//Log::Log(filename);
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 

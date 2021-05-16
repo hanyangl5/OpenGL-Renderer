@@ -19,7 +19,7 @@ public:
 	void Render();
 	void AddModel(std::string name, std::string path);
 	void GetSceneStat();
-	uint32_t RenderAt(std::shared_ptr<Camera> cam);
+	//uint32_t RenderAt(std::shared_ptr<Camera> cam);
 	uint32_t width, height;
 	std::unique_ptr<RenderEngine> render_engine{};
 

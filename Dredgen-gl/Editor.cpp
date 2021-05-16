@@ -170,23 +170,24 @@ void Editor::Run()
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
 			ImGui::Begin("EditMode", 0, window_flags);
 			edit_mode->Render();
-			auto tex = edit_mode->GetTexture();
-			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
+			void* nup = nullptr;
+			auto tex = reinterpret_cast<void*>(edit_mode->GetTexture());
+			ImGui::Image(tex, ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 		}
 		// rendermode
-		if (0)
-		{
-			ImGui::SetNextWindowPos(ImVec2(815, 25));
+		//if (0)
+		//{
+		//	ImGui::SetNextWindowPos(ImVec2(815, 25));
 
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
-			ImGui::Begin("RenderMode", 0, window_flags);
+		//	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
+		//	ImGui::Begin("RenderMode", 0, window_flags);
 
-			auto tex = edit_mode->RenderAt(scene_cam);
-			ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
+		//	auto tex = edit_mode->RenderAt(scene_cam);
+		//	ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
 
-			ImGui::End();
-		}
+		//	ImGui::End();
+		//}
 
 		ImGui::ShowDemoWindow();
 
@@ -323,7 +324,7 @@ void EditMode::GetSceneStat()
 	render_engine->GetSceneStat();
 }
 
-uint32_t EditMode::RenderAt(std::shared_ptr<Camera> cam)
-{
-	return render_engine->RenderAt(cam);
-}
+//uint32_t EditMode::RenderAt(std::shared_ptr<Camera> cam)
+//{
+//	return render_engine->RenderAt(cam);
+//}

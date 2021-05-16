@@ -13,6 +13,9 @@
 #include "Model.h"
 #include "Skybox.h"
 #include "Shadowpass.h"
+#include "Uniformbuffer.h"
+#include "Framebuffer.h"
+#include "Postprocesspass.h"
 class RenderEngine
 {
 
@@ -22,7 +25,7 @@ public:
 	~RenderEngine();
 	void Update();
 	void Render();
-	uint32_t RenderAt(std::shared_ptr<Camera> scene_cam);
+	//uint32_t RenderAt(std::shared_ptr<Camera> scene_cam);
 	void Destroy();
 	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
@@ -32,8 +35,7 @@ public:
 private:
 	void Initglad();
 	void Init();
-	void InitFBO(uint32_t& fbo, uint32_t& ebo);
-	void InitUBO(std::shared_ptr<Shader> shader);
+	//void InitFBO(uint32_t& fbo, uint32_t& ebo);
 private:
 	uint32_t width{}, height{};
 
@@ -47,9 +49,9 @@ private:
 	std::vector<std::shared_ptr<Light>> light;
 
 	std::shared_ptr<Shadowpass> shadowpass;
-	uint32_t edit_fbo,edit_tbo;
-	uint32_t render_fbo{}, render_tbo{};
-	uint32_t ubo_light{};
-	uint32_t uniform_block{};
+	std::shared_ptr<UboLight> ubolight{};
+	std::shared_ptr<Framebuffer> editfbo;
+	std::shared_ptr<Framebuffer> renderfbo;
+	std::shared_ptr<PostProcesspass> postprocess_pass;
 
 };
