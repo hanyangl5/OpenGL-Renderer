@@ -1,3 +1,3 @@
 real-time renderer based on OpenGL
 
-![](resources/figs/ex.png)
+![](resources/figs/ex2.png)
