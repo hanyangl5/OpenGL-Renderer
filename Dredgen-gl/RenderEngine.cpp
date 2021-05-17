@@ -34,8 +34,13 @@ void RenderEngine::Render()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//shadowpass->Draw(scene);
 
-	deferred_pass->Draw(scene, main_cam,skybox);
-	//postprocess_pass->Draw(deferred_pass->fbo); //take color buffer as input
+	deferred_pass->Draw(base_fbo,scene, main_cam,skybox);
+	postprocess_pass->Draw(base_fbo); //take color buffer as input
+}
+uint32_t RenderEngine::GetTexture()
+{
+	//return postprocess_pass->fbo->fbo;
+	return base_fbo->fbo;
 }
 void RenderEngine::GetSceneStat() {
 
@@ -97,11 +102,7 @@ void RenderEngine::Destroy()
 
 }
 
-uint32_t RenderEngine::GetTexture()
-{
-	//return postprocess_pass->fbo->fbo;
-	return deferred_pass->fbo->fbo;
-}
+
 
 void RenderEngine::AddModel(std::string name, std::string path)
 {
@@ -124,7 +125,9 @@ void RenderEngine::Init()
 	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
 	main_cam->SetProjectionMatrix(glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f));
 	light.push_back(std::make_shared<DirectLight>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, -1.0,-1.0)));
-	shadowpass = std::make_shared<Shadowpass>(light[0]);
+	
+	base_fbo = std::make_shared<Framebuffer>(width, height);
+	//shadowpass = std::make_shared<Shadowpass>(light[0]);
 	deferred_pass = std::make_shared<Deferrdpass>(width, height);
 	postprocess_pass = std::make_shared<PostProcesspass>(width, height);
 

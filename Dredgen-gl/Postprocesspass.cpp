@@ -19,11 +19,12 @@ PostProcesspass::~PostProcesspass()
 
 void PostProcesspass::Draw(std::shared_ptr<Framebuffer> color_fbo)
 {
-
+	glBindFramebuffer(GL_FRAMEBUFFER, color_fbo->fbo);
 	glViewport(0, 0, width, height);
-	glDisable(GL_DEPTH_TEST); // disable depth test for postprocess pass
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glDisable(GL_CULL_FACE);
+	//glDisable(GL_DEPTH_TEST); // disable depth test for postprocess pass
+	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	postprocess_shader->use();
 	glActiveTexture(GL_TEXTURE0);
@@ -50,13 +51,11 @@ void PostProcesspass::Draw(std::shared_ptr<Framebuffer> color_fbo)
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
-	//glBindRenderbuffer(GL_RENDERBUFFER, fbo->rbo);
+
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 }

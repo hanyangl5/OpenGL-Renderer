@@ -39,17 +39,15 @@ private:
 private:
 	uint32_t width{}, height{};
 
-	//glm::mat4 projection;
-	//glm::mat4 view;
-
 	std::shared_ptr<Camera> main_cam{};
 	std::shared_ptr<Skybox> skybox{};
 	//std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};
 	std::unordered_map < std::string, std::shared_ptr<Model>> scene;
 	std::vector<std::shared_ptr<Light>> light;
 
-
 	std::shared_ptr<UboLight> ubolight{};
+
+	std::shared_ptr<Framebuffer> base_fbo;
 	std::shared_ptr<Shadowpass> shadowpass;
 	std::shared_ptr<PostProcesspass> postprocess_pass;
 	std::shared_ptr<Deferrdpass> deferred_pass;

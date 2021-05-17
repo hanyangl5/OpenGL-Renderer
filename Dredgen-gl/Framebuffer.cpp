@@ -1,6 +1,7 @@
 #include "Framebuffer.h"
 #include <glad/glad.h>
 #include "Log.h"
+
 Framebuffer::Framebuffer(uint32_t w, uint32_t h) :width(w), height(h)
 {
 	glViewport(0, 0, width, height);
@@ -14,6 +15,10 @@ Framebuffer::Framebuffer(uint32_t w, uint32_t h) :width(w), height(h)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+	data = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, data.data());
+
 	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	
 	glGenRenderbuffers(1, &rbo);
@@ -32,5 +37,5 @@ Framebuffer::~Framebuffer()
 {
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &tex);
-	glDeleteRenderbuffers(1, &rbo);
+	//glDeleteRenderbuffers(1, &rbo);
 }

@@ -1,5 +1,6 @@
 #pragma  once
 #include <cstdint>
+#include <array>
 class Framebuffer
 {
 public:
@@ -7,6 +8,7 @@ public:
 	~Framebuffer();
 
 //private:
-	uint32_t fbo, tex, rbo;
+	std::array<uint32_t, 1>  data;
+	uint32_t fbo, tex,rbo;
 	uint32_t width, height;
 };
