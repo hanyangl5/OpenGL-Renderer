@@ -24,6 +24,8 @@ Framebuffer::Framebuffer(uint32_t w, uint32_t h) :width(w), height(h)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		Log::Err("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Framebuffer::~Framebuffer()

@@ -16,6 +16,7 @@
 #include "Uniformbuffer.h"
 #include "Framebuffer.h"
 #include "Postprocesspass.h"
+#include "Deferrdpass.h"
 class RenderEngine
 {
 
@@ -25,7 +26,6 @@ public:
 	~RenderEngine();
 	void Update();
 	void Render();
-	//uint32_t RenderAt(std::shared_ptr<Camera> scene_cam);
 	void Destroy();
 	std::shared_ptr<Camera> GetCam() {return main_cam;  }
 	uint32_t GetTexture();
@@ -39,19 +39,19 @@ private:
 private:
 	uint32_t width{}, height{};
 
-	glm::mat4 projection;
-	glm::mat4 view;
+	//glm::mat4 projection;
+	//glm::mat4 view;
 
 	std::shared_ptr<Camera> main_cam{};
 	std::shared_ptr<Skybox> skybox{};
-	std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};
+	//std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};
 	std::unordered_map < std::string, std::shared_ptr<Model>> scene;
 	std::vector<std::shared_ptr<Light>> light;
 
-	std::shared_ptr<Shadowpass> shadowpass;
+
 	std::shared_ptr<UboLight> ubolight{};
-	std::shared_ptr<Framebuffer> editfbo;
-	std::shared_ptr<Framebuffer> renderfbo;
+	std::shared_ptr<Shadowpass> shadowpass;
 	std::shared_ptr<PostProcesspass> postprocess_pass;
+	std::shared_ptr<Deferrdpass> deferred_pass;
 
 };

@@ -23,7 +23,7 @@ Model::~Model()
 
 
 // draws the model, and thus all its meshes
-void Model::Draw(Shader& shader, RenderMode renermode)
+void Model::Draw(Shader& shader, RenderMode renermode= Triangle)
 {
 
 	for (uint32_t i = 0; i < meshes.size(); i++) {

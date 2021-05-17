@@ -175,22 +175,6 @@ void Editor::Run()
 			ImGui::Image(tex, ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 		}
-		// rendermode
-		//if (0)
-		//{
-		//	ImGui::SetNextWindowPos(ImVec2(815, 25));
-
-		//	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
-		//	ImGui::Begin("RenderMode", 0, window_flags);
-
-		//	auto tex = edit_mode->RenderAt(scene_cam);
-		//	ImGui::Image(reinterpret_cast<void*>(tex), ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
-
-		//	ImGui::End();
-		//}
-
-		ImGui::ShowDemoWindow();
-
 		// assets 
 		if (1)
 		{

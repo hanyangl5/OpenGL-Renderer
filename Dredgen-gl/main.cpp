@@ -8,7 +8,6 @@ const uint32_t w = 1800, h = 1000;
 
 int main(int argc, char* argv[])
 {
-	//UI ui;
 	Editor editor{ "dredgen graphic engine",w,h };
 
 	try {
