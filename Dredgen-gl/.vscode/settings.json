@@ -2,6 +2,7 @@
     "files.associations": {
         "utility": "cpp",
         "memory": "cpp",
+        "editor.formatOnSave": true,
         "algorithm": "cpp",
         "any": "cpp",
         "array": "cpp",
