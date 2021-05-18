@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
+#include "Log.h"
 Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath)
 {
 	// 1. retrieve the vertex/fragment source code from filePath
@@ -55,11 +55,13 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string geo
 	vertex = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex, 1, &vShaderCode, NULL);
 	glCompileShader(vertex);
+	Log::Log("checking compile errors for: ", vertexPath);
 	checkCompileErrors(vertex, "VERTEX");
 	// fragment Shader
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment, 1, &fShaderCode, NULL);
 	glCompileShader(fragment);
+	Log::Log("checking compile errors for: ", fragmentPath);
 	checkCompileErrors(fragment, "FRAGMENT");
 	// if geometry shader is given, compile geometry shader
 	unsigned int geometry;

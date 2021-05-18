@@ -33,19 +33,21 @@ void RenderEngine::Render()
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//shadowpass->Draw(scene);
-
-	deferred_pass->Draw(base_fbo,scene, main_cam,skybox);
-	postprocess_pass->Draw(base_fbo); //take color buffer as input
+	
+	deferred_pass->Draw(base_fbo,scene, main_cam,quad);
+	ao_pass->Draw(base_fbo, deferred_pass->PosTex(),quad);
+	postprocess_pass->Draw(base_fbo, quad); //take color buffer as input
 }
 uint32_t RenderEngine::GetTexture()
 {
-	//return postprocess_pass->fbo->fbo;
 	return base_fbo->fbo;
 }
 void RenderEngine::GetSceneStat() {
 
 	//ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
 	ImGui::Begin("scene");
+	ImGui::SliderFloat("ssao factor",&ao_pass->factor,0.01f,2.0f );
+	//ao_pass->SetSSAOFactor(ssao_factor);
 	static int s_selected = -1;
 	int index = 0;
 	static std::string k;
@@ -125,10 +127,11 @@ void RenderEngine::Init()
 	main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
 	main_cam->SetProjectionMatrix(glm::perspective(glm::radians(main_cam->Zoom), (float)width / (float)height, 0.1f, 1000.0f));
 	light.push_back(std::make_shared<DirectLight>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, -1.0,-1.0)));
-	
+	quad = std::make_shared<Quad>();
 	base_fbo = std::make_shared<Framebuffer>(width, height);
 	//shadowpass = std::make_shared<Shadowpass>(light[0]);
 	deferred_pass = std::make_shared<Deferrdpass>(width, height);
+	ao_pass = std::make_shared<Aopass>(width, height);
 	postprocess_pass = std::make_shared<PostProcesspass>(width, height);
 
 
@@ -136,8 +139,8 @@ void RenderEngine::Init()
 	//ubolight = std::make_shared<UboLight>(shaders.at("modelshader"));
 
 	skybox = std::make_shared<Skybox>("../resources/textures/CornellBox");
-	scene.insert({ "helmet", std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
-	scene.insert({ "thorn",std::make_shared<Model>("../resources/models/thorn/thorn.gltf") });
+	//scene.insert({ "helmet", std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
+	//scene.insert({ "thorn",std::make_shared<Model>("../resources/models/thorn/thorn.gltf") });
 	scene.insert({ "sponza", std::make_shared<Model>("../resources/models/Sponza/glTF/Sponza.gltf") });
 
 	//for (uint32_t i = 0; i < 100; i++) {

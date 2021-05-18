@@ -5,7 +5,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include "Model.h"
 #include "Log.h"
-
+#include <assimp/pbrmaterial.h>
 
 Model::Model(std::string const& path, bool gamma)
 {
@@ -174,6 +174,15 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 	// 4. height maps
 	std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+	
+	std::vector<Texture> MetallicRoughness = loadMaterialTextures(material, aiTextureType_UNKNOWN, "texture_metallicroughness");
+	textures.insert(textures.end(), MetallicRoughness.begin(), MetallicRoughness.end());
+	for (auto& i : MetallicRoughness)
+	{
+		//Log::Log(i.path);
+	}
+
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 	// return a mesh object created from the extracted mesh data

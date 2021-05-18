@@ -17,6 +17,8 @@
 #include "Framebuffer.h"
 #include "Postprocesspass.h"
 #include "Deferrdpass.h"
+#include "utils.h"
+#include "Aopass.h"
 class RenderEngine
 {
 
@@ -51,5 +53,6 @@ private:
 	std::shared_ptr<Shadowpass> shadowpass;
 	std::shared_ptr<PostProcesspass> postprocess_pass;
 	std::shared_ptr<Deferrdpass> deferred_pass;
-
+	std::shared_ptr<Aopass> ao_pass;
+	std::shared_ptr<Quad> quad;
 };

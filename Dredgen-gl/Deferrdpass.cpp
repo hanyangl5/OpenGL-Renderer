@@ -75,18 +75,19 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) :width(w), height(h)
 
 Deferrdpass::~Deferrdpass()
 {
-	glDeleteTextures(GL_TEXTURE_2D,&gAlbedoSpec);
-	glDeleteTextures(GL_TEXTURE_2D,&gNormal);
-	glDeleteTextures(GL_TEXTURE_2D,&gPosition);
-	glDeleteBuffers(GL_FRAMEBUFFER, &gBuffer);
-	glDeleteRenderbuffers(GL_RENDERBUFFER, &rboDepth);
+
+	//glDeleteBuffers(GL_FRAMEBUFFER, &gBuffer);
+	//glDeleteRenderbuffers(GL_RENDERBUFFER, &rboDepth);
+	//glDeleteTextures(GL_TEXTURE_2D, &gAlbedoSpec);
+	//glDeleteTextures(GL_TEXTURE_2D, &gNormal);
+	//glDeleteTextures(GL_TEXTURE_2D, &gPosition);
 }
 
 // dst frame buffer, scene, cam, skybox
-void Deferrdpass::Draw(std::shared_ptr<Framebuffer>& dst,
-	std::unordered_map < std::string, std::shared_ptr<Model>> scene,
+void Deferrdpass::Draw(std::shared_ptr<Framebuffer> dst,
+	std::unordered_map < std::string, std::shared_ptr<Model>>& scene,
 	std::shared_ptr<Camera> cam,
-	std::shared_ptr<Skybox> skybox)
+	std::shared_ptr<Quad> quad)
 {
 	glViewport(0, 0, width, height);
 
@@ -140,33 +141,48 @@ void Deferrdpass::Draw(std::shared_ptr<Framebuffer>& dst,
 			lightingpass_shader->setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 		}
 
+		quad->Draw();
+		//if (quadVAO == 0)
+		//{
+		//	float quadVertices[] = {
+		//		// positions        // texture Coords
+		//		-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+		//		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+		//		 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+		//		 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		//	};
+		//	// setup plane VAO
+		//	glGenVertexArrays(1, &quadVAO);
+		//	glGenBuffers(1, &quadVBO);
+		//	glBindVertexArray(quadVAO);
+		//	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		//	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		//	glEnableVertexAttribArray(0);
+		//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		//	glEnableVertexAttribArray(1);
+		//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		//}
 
-		if (quadVAO == 0)
-		{
-			float quadVertices[] = {
-				// positions        // texture Coords
-				-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-				 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-				 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-			};
-			// setup plane VAO
-			glGenVertexArrays(1, &quadVAO);
-			glGenBuffers(1, &quadVBO);
-			glBindVertexArray(quadVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-		}
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-		glBindVertexArray(0);
+		//glBindVertexArray(quadVAO);
+		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		//glBindVertexArray(0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 
+}
+
+uint32_t Deferrdpass::PosTex() const
+{
+	return gPosition;
+}
+
+uint32_t Deferrdpass::NormalTex() const
+{
+	return gNormal;
+}
+
+uint32_t Deferrdpass::AlbedoTex() const
+{
+	return gAlbedoSpec;
 }
