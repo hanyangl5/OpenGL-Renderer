@@ -1,7 +1,7 @@
+#include <glad/glad.h>
 #include "Shader.h"
 #include "Log.h"
 #include <fstream>
-#include <glad/glad.h>
 #include <iostream>
 #include <sstream>
 #include <string>

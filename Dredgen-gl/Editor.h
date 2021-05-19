@@ -1,9 +1,9 @@
 #pragma once
-// standard libs
 
-// 3rd libs
+
+
 #include <GLFW/glfw3.h>
-// headers
+
 #include "Asset.h"
 #include "RenderEngine.h"
 class Logger {};

@@ -1,11 +1,11 @@
+#include <glad/glad.h>
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <array>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <nfd.h>
-// headers
+
 #include "Editor.h"
 #include "Log.h"
 #include "utils.h"

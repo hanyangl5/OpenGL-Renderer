@@ -1,9 +1,6 @@
-
-// standard libs
 #include <iostream>
-// 3rd libs
-// headers
 #include "Editor.h"
+
 const uint32_t w = 1800, h = 1000;
 
 int main(int argc, char *argv[]) {

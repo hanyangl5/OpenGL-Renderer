@@ -1,12 +1,11 @@
+#include <glad/glad.h>
 #include "RenderEngine.h"
 #include "Log.h"
 #include <array>
-#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <stb_image.h>
-
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <imgui.h>
@@ -25,12 +24,13 @@ void RenderEngine::Update() {
 }
 
 void RenderEngine::Render() {
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   // shadowpass->Draw(scene);
 
   deferred_pass->Draw(base_fbo, scene, main_cam, quad);
-  ao_pass->Draw(base_fbo, deferred_pass->PosTex(), quad);
-  postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
+  //postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  //skybox->Draw(base_fbo,main_cam->GetViewMatrix(),main_cam->projection,deferred_pass->PosTex());
 }
 uint32_t RenderEngine::GetTexture() { return base_fbo->fbo; }
 void RenderEngine::GetSceneStat() {
@@ -130,17 +130,10 @@ void RenderEngine::Init() {
   // std::make_shared<UboLight>(shaders.at("modelshader"));
 
   skybox = std::make_shared<Skybox>("../resources/textures/CornellBox");
-  // scene.insert({ "helmet",
-  // std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")
-  // }); scene.insert({
+  scene.insert({ "helmet",std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")});
+  // scene.insert({
   // "thorn",std::make_shared<Model>("../resources/models/thorn/thorn.gltf") });
-  scene.insert({"sponza", std::make_shared<Model>(
-                              "../resources/models/Sponza/glTF/Sponza.gltf")});
+  scene.insert({ "sponza", std::make_shared<Model>(
+							  "../resources/models/Sponza/glTF/Sponza.gltf") });
 
-  // for (uint32_t i = 0; i < 100; i++) {
-  //	scene.insert({std::to_string(i),
-  //std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")});
-  //	scene[std::to_string(i)]->transform.pos = glm::vec3(2*(i%10), 2*i/10,
-  //0);
-  //}
 }

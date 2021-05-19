@@ -1,9 +1,9 @@
 #pragma once
-// standard libs
+
 #include <iostream>
 #include <string>
-// 3rd libs
-// headers
+
+
 
 namespace Log {
 

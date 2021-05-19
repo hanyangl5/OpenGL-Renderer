@@ -1,6 +1,5 @@
-#include "Uniformbuffer.h"
 #include <glad/glad.h>
-
+#include "Uniformbuffer.h"
 #include <glm/gtc/type_ptr.hpp>
 UboLight::UboLight(std::shared_ptr<Shader> shader) {
   // generate uniform buffer

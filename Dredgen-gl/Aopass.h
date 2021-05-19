@@ -10,7 +10,7 @@ public:
   Aopass(uint32_t w, uint32_t h);
   ~Aopass();
   void SetSSAOFactor(float factor);
-  void Draw(std::shared_ptr<Framebuffer> color_fbo, uint32_t depthtex,
+  void Draw(std::shared_ptr<Framebuffer> color_fbo, uint32_t depthtex,uint32_t normal_tex,
             std::shared_ptr<Quad> quad);
   float factor = 0.05;
 

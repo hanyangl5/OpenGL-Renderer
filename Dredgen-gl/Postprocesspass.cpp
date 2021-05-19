@@ -1,6 +1,7 @@
+#include <glad/glad.h>
 #include "Postprocesspass.h"
 #include "Log.h"
-#include <glad/glad.h>
+
 
 PostProcesspass::PostProcesspass(uint32_t w, uint32_t h) : width(w), height(h) {
   postprocess_shader =

@@ -3,11 +3,12 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include "Framebuffer.h"
 class Skybox {
 public:
   Skybox(std::string dirpath);
   ~Skybox();
-  void Draw(glm::mat4 projmat, glm::mat3 viewmat);
+  void Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat,uint32_t pos);
 
 private:
   uint32_t skybox_texture, skybox_vao, skybox_vbo;

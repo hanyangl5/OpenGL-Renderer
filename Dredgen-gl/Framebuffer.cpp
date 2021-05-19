@@ -1,6 +1,7 @@
+#include <glad/glad.h>
 #include "Framebuffer.h"
 #include "Log.h"
-#include <glad/glad.h>
+
 
 Framebuffer::Framebuffer(uint32_t w, uint32_t h) : width(w), height(h) {
   glViewport(0, 0, width, height);

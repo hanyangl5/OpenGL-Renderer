@@ -20,28 +20,21 @@ void Mesh::ReleaseBuffer() {
 
 void Mesh::Draw(Shader &shader, RenderMode renermode) {
   // bind appropriate textures
-  uint32_t diffuseNr = 1;
-  uint32_t specularNr = 1;
+  uint32_t albedoNr = 1;
   uint32_t normalNr = 1;
-  uint32_t heightNr = 1;
+  uint32_t metallicroughnessNr = 1;
   for (uint32_t i = 0; i < textures.size(); i++) {
-    glActiveTexture(GL_TEXTURE0 +
-                    i); // active proper texture unit before binding
-    // retrieve texture number (the N in diffuse_textureN)
+    glActiveTexture(GL_TEXTURE0 +i);
     std::string number;
     std::string name = textures[i].type;
-    if (name == "texture_diffuse")
-      number = std::to_string(diffuseNr++);
-    else if (name == "texture_specular")
-      number = std::to_string(specularNr++); // transfer uint32_t to stream
+    if (name == "texture_albedo")
+      number = std::to_string(albedoNr++);
     else if (name == "texture_normal")
       number = std::to_string(normalNr++); // transfer uint32_t to stream
-    else if (name == "texture_height")
-      number = std::to_string(heightNr++); // transfer uint32_t to stream
-
+	else if (name == "texture_metallicroughness")
+	number = std::to_string(metallicroughnessNr++); // transfer uint32_t to stream
     // now set the sampler to the correct texture unit
-    glUniform1i(glGetUniformLocation(shader.Program, (name + number).c_str()),
-                i);
+    glUniform1i(glGetUniformLocation(shader.Program, (name + number).c_str()),i);
     // and finally bind the texture
     glBindTexture(GL_TEXTURE_2D, textures[i].id);
   }

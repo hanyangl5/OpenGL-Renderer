@@ -1,15 +1,15 @@
 #pragma once
-// standard libs
+
 #include <memory>
 #include <unordered_map>
-// 3rd libs
+
 #include "Camera.h"
 #include "Light.h"
 #include "Shader.h"
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <glm/glm.hpp>
-// headers
+
 #include "Aopass.h"
 #include "Deferrdpass.h"
 #include "Framebuffer.h"

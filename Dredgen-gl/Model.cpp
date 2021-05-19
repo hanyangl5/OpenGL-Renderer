@@ -145,32 +145,30 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   // as the following list summarizes: diffuse: texture_diffuseN specular:
   // texture_specularN normal: texture_normalN
 
-  // 1. diffuse maps
-  std::vector<Texture> diffuseMaps =
-      loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-  textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-  // 2. specular maps
-  std::vector<Texture> specularMaps = loadMaterialTextures(
-      material, aiTextureType_SPECULAR, "texture_specular");
-  textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+  // 1. albedo maps
+
+  std::vector<Texture> albedoMaps =
+      loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo");
+  textures.insert(textures.end(), albedoMaps.begin(), albedoMaps.end());
+
   // 3. normal maps
   std::vector<Texture> normalMaps =
       loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
   textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-  // 4. height maps
-  std::vector<Texture> heightMaps =
-      loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-  textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-  std::vector<Texture> MetallicRoughness = loadMaterialTextures(
+  std::vector<Texture> MetallicRoughnessMaps = loadMaterialTextures(
       material, aiTextureType_UNKNOWN, "texture_metallicroughness");
-  textures.insert(textures.end(), MetallicRoughness.begin(),
-                  MetallicRoughness.end());
-  for (auto &i : MetallicRoughness) {
-    // Log::Log(i.path);
-  }
+  textures.insert(textures.end(), MetallicRoughnessMaps.begin(),
+      MetallicRoughnessMaps.end());
 
-  textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+  Log::Log("albedo texture:");
+  for (auto& i : albedoMaps) {
+	  Log::Log(i.path);
+  }
+  Log::Log("metallic texture:");
+  for (auto &i : MetallicRoughnessMaps) {
+     Log::Log(i.path);
+  }
 
   // return a mesh object created from the extracted mesh data
   return Mesh(vertices, indices, textures);

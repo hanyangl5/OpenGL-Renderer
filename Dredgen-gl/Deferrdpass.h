@@ -23,8 +23,8 @@ public:
 private:
   uint32_t width, height;
   uint32_t gBuffer, rboDepth;
-  uint32_t gPosition, gNormal, gAlbedoSpec;
+  uint32_t gPosition, gNormal, gAlbedo, gMetallicRoughness;
   std::shared_ptr<Shader> geopass_shader;
   std::shared_ptr<Shader> lightingpass_shader;
-  std::array<uint32_t, 3> attachments;
+  std::array<uint32_t, 4> attachments;
 };
