@@ -160,15 +160,12 @@ void Deferrdpass::Draw(
                                    lightPositions[i]);
       lightingpass_shader->setVec3("lights[" + std::to_string(i) + "].Color",
                                    lightColors[i]);
-      // update attenuation parameters and calculate radius
-      const float linear = 0.7;
-      const float quadratic = 1.8;
-      lightingpass_shader->setFloat("lights[" + std::to_string(i) + "].Linear",
-                                    linear);
-      lightingpass_shader->setFloat(
-          "lights[" + std::to_string(i) + "].Quadratic", quadratic);
     }
+    glm::vec3 light_dir(-1.0, -1.0, -1.0);
+    glm::vec3 light_color(1.0,0.9568,0.4392);
 
+    lightingpass_shader->setVec3("directlight.Direction", light_dir);
+    lightingpass_shader->setVec3("directlight.Color", 2.0f*light_color);
     quad->Draw();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }

@@ -35,6 +35,7 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height)
     Log::Err("Failed to initialize GLAD");
   }
   edit_mode = std::make_shared<EditMode>(800, 600);
+  //edit_mode = std::make_shared<EditMode>(1800, 900);
 }
 Editor::~Editor() {
   glfwDestroyWindow(base_window);
@@ -146,8 +147,7 @@ void Editor::Run() {
     {
       ImGui::SetNextWindowPos(ImVec2(0, 25));
 
-      ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar |
+      ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar |
                                       ImGuiWindowFlags_AlwaysAutoResize;
       ImGui::Begin("EditMode", 0, window_flags);
       edit_mode->Render();

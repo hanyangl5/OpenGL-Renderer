@@ -12,7 +12,7 @@ public:
   void SetSSAOFactor(float factor);
   void Draw(std::shared_ptr<Framebuffer> color_fbo, uint32_t depthtex,uint32_t normal_tex,
             std::shared_ptr<Quad> quad);
-  float factor = 0.05;
+  float factor = 0.001;
 
 private:
   uint32_t width, height;

@@ -8,15 +8,19 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedo;
 uniform sampler2D gMetallicRoughness;
 
-struct Light {
+struct PointLight {
   vec3 Position;
   vec3 Color;
-  float Linear;
-  float Quadratic;
 };
+struct DirectLight {
+  vec3 Direction;
+  vec3 Color;
+};
+
 const int NR_LIGHTS = 32;
-uniform Light lights[NR_LIGHTS];
+uniform PointLight lights[NR_LIGHTS];
 uniform vec3 viewPos;
+uniform DirectLight directlight;
 
 const float PI = 3.14159265359;
 
@@ -41,7 +45,7 @@ void main() {
 
   // reflectance equation
   vec3 Lo = vec3(0.0);
-  // loop over all light source
+  // loop over all point light  source
   for (int i = 0; i < 32; ++i) {
     // calculate per-light radiance
     vec3 L = normalize(lights[i].Position - FragPos);
@@ -67,7 +71,29 @@ void main() {
     float NdotL = max(dot(N, L), 0.0);
     Lo += (kD * albedo / PI + specular) * radiance * NdotL;
   }
+  // add global light(dirctlight)
+  {
+    vec3 L = -normalize(directlight.Direction);
+    vec3 H = normalize(V + L);
+    vec3 radiance = directlight.Color;
 
+    // cook-torrance brdf
+    float NDF = DistributionGGX(N, H, roughness);
+    float G = GeometrySmith(N, V, L, roughness);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+    vec3 specular = numerator / max(denominator, 0.001);
+
+    // add to outgoing radiance Lo
+    float NdotL = max(dot(N, L), 0.0);
+    Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+  }
   vec3 color = Lo;
   FragColor = vec4(color, 1.0);
 }

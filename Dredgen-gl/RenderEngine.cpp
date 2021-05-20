@@ -28,8 +28,9 @@ void RenderEngine::Render() {
   // shadowpass->Draw(scene);
 
   deferred_pass->Draw(base_fbo, scene, main_cam, quad);
-  //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
-  //postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
+  postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  //aa_pass->Draw(base_fbo, quad);
   //skybox->Draw(base_fbo,main_cam->GetViewMatrix(),main_cam->projection,deferred_pass->PosTex());
 }
 uint32_t RenderEngine::GetTexture() { return base_fbo->fbo; }
@@ -38,7 +39,8 @@ void RenderEngine::GetSceneStat() {
   // ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize |
   // ImGuiWindowFlags_NoScrollWithMouse;
   ImGui::Begin("scene");
-  ImGui::SliderFloat("ssao factor", &ao_pass->factor, 0.001f, 1.0f);
+  ImGui::SliderFloat("ssao factor", &ao_pass->factor, 0.001f,0.05f);
+  ImGui::SliderFloat("luma threshold", &aa_pass->luma_threshold, 0.00001f,1.0f);
   static int s_selected = -1;
   int index = 0;
   static std::string k;
@@ -110,7 +112,7 @@ void RenderEngine::Initglad() {
 
 void RenderEngine::Init() {
   // camera
-  main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f));
+  main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 2.0f, 0.0f));
   main_cam->SetProjectionMatrix(glm::perspective(glm::radians(main_cam->Zoom),
                                                  (float)width / (float)height,
                                                  0.1f, 1000.0f));
@@ -123,14 +125,14 @@ void RenderEngine::Init() {
   deferred_pass = std::make_shared<Deferrdpass>(width, height);
   ao_pass = std::make_shared<Aopass>(width, height);
   postprocess_pass = std::make_shared<PostProcesspass>(width, height);
-
+  aa_pass = std::make_shared<PostAApass>(width, height);
   // shaders.insert({ "modelshader",
   // std::make_shared<Shader>("../resources/shaders/modelvs.glsl",
   // "../resources/shaders/modelps.glsl") }); ubolight =
   // std::make_shared<UboLight>(shaders.at("modelshader"));
 
   skybox = std::make_shared<Skybox>("../resources/textures/CornellBox");
-  scene.insert({ "helmet",std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")});
+  //scene.insert({ "helmet",std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")});
   // scene.insert({
   // "thorn",std::make_shared<Model>("../resources/models/thorn/thorn.gltf") });
   scene.insert({ "sponza", std::make_shared<Model>(

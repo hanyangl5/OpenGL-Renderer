@@ -33,8 +33,3 @@ public:
   glm::vec3 GetPos() const override;
   LightType GetType() const override;
 };
-
-// class SpotLight:public Light{
-// public:
-//     SpotLight();
-// };

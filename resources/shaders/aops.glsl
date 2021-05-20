@@ -10,7 +10,7 @@ uniform sampler2D normal_tex;
 
 uniform float ssao_factor;
 
-#define sample_point 64
+#define sample_point 32
 #define BLOCKER_SEARCH_NUM_SAMPLES sample_point
 #define PCF_NUM_SAMPLES sample_point
 #define NUM_RINGS 10
