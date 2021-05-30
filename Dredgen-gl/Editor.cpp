@@ -19,8 +19,8 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height)
     Log::Log("failed to init glfw");
   };
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.6);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.6);
   base_window = glfwCreateWindow(width, height, "Dredgen-gl", nullptr, nullptr);
 
   if (!base_window) {
@@ -29,7 +29,7 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height)
   }
 
   glfwMakeContextCurrent(base_window);
-  glfwSwapInterval(1); // Enable vsync
+  glfwSwapInterval(0); // Enable vsync
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     Log::Err("Failed to initialize GLAD");
@@ -248,7 +248,9 @@ void Editor::Run() {
 void Editor::processInput(GLFWwindow *window) {
 
   float delta_time = ImGui::GetIO().Framerate / 3000.0f;
+  //Log::Log(delta_time);
   // drag with right mouse button
+  //1seond 1m
   if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
     edit_mode->render_engine->GetCam()->ProcessMouseMovement(xoffset, yoffset);
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

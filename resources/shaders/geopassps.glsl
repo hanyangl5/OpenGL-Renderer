@@ -3,7 +3,7 @@
 layout(location = 0) in PS_IN {
   vec3 FragPos;
   vec2 TexCoords;
-  vec3 Normal;
+  vec4 Normal;
 }
 ps_in;
 
@@ -19,8 +19,7 @@ void main() {
   // store the fragment position vector in the first gbuffer texture
   gPosition.rgb = ps_in.FragPos;
   // [normalx,normaly,normalz,depth]
-  gNormal.rgb = normalize(ps_in.Normal);
-  gNormal.a = ps_in.FragPos.z;
+  gNormal = ps_in.Normal;
   // [albedo]
   gAlbedo.rgb = texture(texture_diffuse1, ps_in.TexCoords).rgb;
   // metallic roughness

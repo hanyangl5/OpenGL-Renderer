@@ -1,25 +1,11 @@
 #include <glad/glad.h>
 #include "Deferrdpass.h"
+#include "Light.h"
 
 
-const unsigned int NR_LIGHTS = 32;
-std::vector<glm::vec3> lightPositions;
-std::vector<glm::vec3> lightColors;
-// srand(13);
 
 Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
-  for (unsigned int i = 0; i < NR_LIGHTS; i++) {
-    // calculate slightly random offsets
-    float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-    float yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
-    float zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-    lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
-    // also calculate random color
-    float rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-    float gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-    float bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-    lightColors.push_back(glm::vec3(rColor, gColor, bColor));
-  }
+
   geopass_shader =
       std::make_shared<Shader>("../resources/shaders/geopassvs.glsl",
                                "../resources/shaders/geopassps.glsl");
@@ -111,7 +97,8 @@ Deferrdpass::~Deferrdpass() {
 void Deferrdpass::Draw(
     std::shared_ptr<Framebuffer> dst,
     std::unordered_map<std::string, std::shared_ptr<Model>> &scene,
-    std::shared_ptr<Camera> cam, std::shared_ptr<Quad> quad) {
+    std::shared_ptr<Camera> cam, std::shared_ptr<Quad> quad,
+    std::shared_ptr<Skybox> skybox, std::vector<std::shared_ptr<Light>>&lights) {
   glViewport(0, 0, width, height);
 
   // geometry pass
@@ -120,11 +107,11 @@ void Deferrdpass::Draw(
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     geopass_shader->use();
     geopass_shader->setMat4("projection", cam->projection);
     geopass_shader->setMat4("view", cam->GetViewMatrix());
@@ -134,6 +121,34 @@ void Deferrdpass::Draw(
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    geopass_shader->unuse();
+  }
+
+  // send light to shader
+  {
+      lightingpass_shader->use();
+      uint8_t point_light_index = 0;
+      uint8_t direct_light_index = 0;
+
+      for (auto l : lights) {
+		  switch (l->GetType())
+		  {
+		  case LightType::Direct:
+			  lightingpass_shader->setVec3("direct_lights[" + std::to_string(direct_light_index) + "].Direction", l->GetDir());
+			  lightingpass_shader->setVec3("direct_lights[" + std::to_string(direct_light_index) + "].Color", l->GetColor());
+              direct_light_index++;
+			  break;
+		  case LightType::Point:
+			  lightingpass_shader->setVec3("point_lights[" + std::to_string(point_light_index) + "].Position", l->GetPos());
+			  lightingpass_shader->setVec3("point_lights[" + std::to_string(point_light_index) + "].Color", l->GetColor());
+              point_light_index++;
+			  break;
+		  case LightType::Spot:
+			  break;
+		  default:
+			  break;
+		  }
+      }
   }
 
   // lighting pass
@@ -153,21 +168,13 @@ void Deferrdpass::Draw(
     glBindTexture(GL_TEXTURE_2D, gAlbedo);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gMetallicRoughness);
-
-    // send light relevant uniforms
-    for (unsigned int i = 0; i < lightPositions.size(); i++) {
-      lightingpass_shader->setVec3("lights[" + std::to_string(i) + "].Position",
-                                   lightPositions[i]);
-      lightingpass_shader->setVec3("lights[" + std::to_string(i) + "].Color",
-                                   lightColors[i]);
-    }
-    glm::vec3 light_dir(-1.0, -1.0, -1.0);
-    glm::vec3 light_color(1.0,0.9568,0.4392);
-
-    lightingpass_shader->setVec3("directlight.Direction", light_dir);
-    lightingpass_shader->setVec3("directlight.Color", 2.0f*light_color);
     quad->Draw();
+    lightingpass_shader->unuse();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
+  // skybox
+  {
+	  //skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex());
   }
 }
 

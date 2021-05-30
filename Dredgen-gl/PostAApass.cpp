@@ -26,4 +26,5 @@ void PostAApass::Draw(std::shared_ptr<Framebuffer> color_fbo,
 	quad->Draw();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	postaa_shader->unuse();
 }

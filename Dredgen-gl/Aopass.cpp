@@ -28,5 +28,6 @@ void Aopass::Draw(std::shared_ptr<Framebuffer> color_fbo, uint32_t pos_tex, uint
 
   quad->Draw();
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  ao_shader->unuse();
 }
 Aopass::~Aopass() {}

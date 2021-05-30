@@ -62,10 +62,11 @@ void poissonDiskSamples(const in vec2 randomSeed) {
   }
 }
 void main() {
-  float depth = texture(pos_tex, TexCoords).z;
+  float depth = texture(normal_tex, TexCoords).a;
+  // float depth = texture(pos_tex, TexCoords).z;
   poissonDiskSamples(TexCoords);
   for (int i = 0; i < sample_point; i++) {
-    float sampleDepth = texture(pos_tex, TexCoords + poissonDisk[i]).z;
+    float sampleDepth = texture(normal_tex, TexCoords + poissonDisk[i]).a;
     if (sampleDepth > depth) {
       occlusion += 1.0;
     }

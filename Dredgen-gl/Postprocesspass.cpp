@@ -16,6 +16,7 @@ PostProcesspass::~PostProcesspass() {}
 
 void PostProcesspass::Draw(std::shared_ptr<Framebuffer> color_fbo,
                            std::shared_ptr<Quad> quad) {
+
   glBindFramebuffer(GL_FRAMEBUFFER, color_fbo->fbo);
   glViewport(0, 0, width, height);
   postprocess_shader->use();
@@ -23,6 +24,7 @@ void PostProcesspass::Draw(std::shared_ptr<Framebuffer> color_fbo,
   glBindTexture(GL_TEXTURE_2D, color_fbo->tex);
 
   quad->Draw();
-
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  postprocess_shader->unuse();
 }

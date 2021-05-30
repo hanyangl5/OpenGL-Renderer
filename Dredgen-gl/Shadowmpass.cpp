@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-Shadowpass::Shadowpass(std::shared_ptr<Light> light) {
+Shadowpass::Shadowpass(uint32_t w, uint32_t h) {
   glGenFramebuffers(1, &shadow_fbo);
   glGenTextures(1, &shadow_tex);
   glBindTexture(GL_TEXTURE_2D, shadow_tex);
@@ -33,7 +33,7 @@ Shadowpass::Shadowpass(std::shared_ptr<Light> light) {
 Shadowpass::~Shadowpass() {}
 
 void Shadowpass::Draw(
-    std::unordered_map<std::string, std::shared_ptr<Model>> &scene) {
+    std::unordered_map<std::string, std::shared_ptr<Model>> &scene, std::vector<std::shared_ptr<Light>>&lights) {
 
   glClear(GL_DEPTH_BUFFER_BIT);
 

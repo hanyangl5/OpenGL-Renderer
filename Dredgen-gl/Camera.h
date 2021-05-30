@@ -11,7 +11,7 @@ enum class Direction { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 // Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 2.5f;
+const float SPEED = 0.1f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 90.0f;
 
@@ -62,6 +62,7 @@ public:
     view = glm::lookAt(Position, Position + Front, Up);
     return view;
   }
+  
   void SetProjectionMatrix(glm::mat4 proj) { projection = proj; }
   // processes input received from any keyboard-like input system. Accepts input
   // parameter in the form of camera defined ENUM (to abstract it from windowing

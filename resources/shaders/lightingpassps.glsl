@@ -18,9 +18,9 @@ struct DirectLight {
 };
 
 const int NR_LIGHTS = 32;
-uniform PointLight lights[NR_LIGHTS];
+uniform PointLight point_lights[NR_LIGHTS];
+uniform DirectLight direct_lights[NR_LIGHTS];
 uniform vec3 viewPos;
-uniform DirectLight directlight;
 
 const float PI = 3.14159265359;
 
@@ -31,6 +31,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
 void main() {
 
+  // vec3 albedo = pow(texture(gAlbedo, TexCoords).rgb, vec3(2.2));
   vec3 albedo = texture(gAlbedo, TexCoords).rgb;
   float metallic = texture(gMetallicRoughness, TexCoords).r;
   float roughness = texture(gMetallicRoughness, TexCoords).g;
@@ -45,14 +46,15 @@ void main() {
 
   // reflectance equation
   vec3 Lo = vec3(0.0);
-  // loop over all point light  source
-  for (int i = 0; i < 32; ++i) {
+
+  // point light
+  for (int i = 0; i < NR_LIGHTS; ++i) {
     // calculate per-light radiance
-    vec3 L = normalize(lights[i].Position - FragPos);
+    vec3 L = normalize(point_lights[i].Position - FragPos);
     vec3 H = normalize(V + L);
-    float distance = length(lights[i].Position - FragPos);
+    float distance = length(point_lights[i].Position - FragPos);
     float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = lights[i].Color * attenuation;
+    vec3 radiance = point_lights[i].Color * attenuation;
 
     // cook-torrance brdf
     float NDF = DistributionGGX(N, H, roughness);
@@ -71,11 +73,12 @@ void main() {
     float NdotL = max(dot(N, L), 0.0);
     Lo += (kD * albedo / PI + specular) * radiance * NdotL;
   }
-  // add global light(dirctlight)
-  {
-    vec3 L = -normalize(directlight.Direction);
+
+  // dirctlight
+  for (int i = 0; i < NR_LIGHTS; ++i) {
+    vec3 L = -normalize(direct_lights[i].Direction);
     vec3 H = normalize(V + L);
-    vec3 radiance = directlight.Color;
+    vec3 radiance = direct_lights[i].Color;
 
     // cook-torrance brdf
     float NDF = DistributionGGX(N, H, roughness);

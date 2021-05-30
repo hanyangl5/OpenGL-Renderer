@@ -8,7 +8,7 @@ class Skybox {
 public:
   Skybox(std::string dirpath);
   ~Skybox();
-  void Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat,uint32_t pos);
+  void Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat, uint32_t normal_tex);
 
 private:
   uint32_t skybox_texture, skybox_vao, skybox_vbo;

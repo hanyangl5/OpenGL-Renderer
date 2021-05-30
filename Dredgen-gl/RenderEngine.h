@@ -36,7 +36,7 @@ public:
 private:
   void Initglad();
   void Init();
-  // void InitFBO(uint32_t& fbo, uint32_t& ebo);
+  void InitAssets();
 private:
   uint32_t width{}, height{};
 
@@ -44,7 +44,7 @@ private:
   std::shared_ptr<Skybox> skybox{};
   // std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};
   std::unordered_map<std::string, std::shared_ptr<Model>> scene;
-  std::vector<std::shared_ptr<Light>> light;
+  std::vector<std::shared_ptr<Light>> lights;
   std::shared_ptr<UboLight> ubolight{};
 
   std::shared_ptr<Framebuffer> base_fbo;

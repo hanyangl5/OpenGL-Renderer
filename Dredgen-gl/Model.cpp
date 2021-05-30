@@ -161,14 +161,14 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   textures.insert(textures.end(), MetallicRoughnessMaps.begin(),
       MetallicRoughnessMaps.end());
 
-  Log::Log("albedo texture:");
-  for (auto& i : albedoMaps) {
-	  Log::Log(i.path);
-  }
-  Log::Log("metallic texture:");
-  for (auto &i : MetallicRoughnessMaps) {
-     Log::Log(i.path);
-  }
+  //Log::Log("albedo texture:");
+  //for (auto& i : albedoMaps) {
+	 // Log::Log(i.path);
+  //}
+  //Log::Log("metallic texture:");
+  //for (auto &i : MetallicRoughnessMaps) {
+  //   Log::Log(i.path);
+  //}
 
   // return a mesh object created from the extracted mesh data
   return Mesh(vertices, indices, textures);
