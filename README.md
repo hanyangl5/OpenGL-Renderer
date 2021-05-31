@@ -1,8 +1,8 @@
 # real-time renderer based on OpenGL
 
-![](resources/figs/ex2.png)
+![](resources/figs/ex3.png)
 
 **rendering architecture**
 
-Geometry Pass -> Deferred Lighting Pass -> Post Process Pass
+( Shadow Pass ) -> Geometry Pass -> Deferred Lighting Pass -> Screen Space AO Pass ->Post Process Pass -> Post AA Pass
 

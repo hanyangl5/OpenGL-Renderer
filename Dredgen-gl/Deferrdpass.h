@@ -17,7 +17,10 @@ public:
   void Draw(std::shared_ptr<Framebuffer> dst,
             std::unordered_map<std::string, std::shared_ptr<Model>> &scene,
             std::shared_ptr<Camera> cam,
-      std::shared_ptr<Quad> quad, std::shared_ptr<Skybox> skybox, std::vector<std::shared_ptr<Light>>&lights);
+      std::shared_ptr<Quad> quad,
+      std::shared_ptr<Skybox> skybox,
+      std::vector<std::shared_ptr<Light>>&lights,
+      uint32_t shadowmap);
   uint32_t PosTex() const;
   uint32_t NormalTex() const;
   uint32_t AlbedoTex() const;

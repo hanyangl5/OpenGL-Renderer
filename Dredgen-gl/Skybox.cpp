@@ -81,7 +81,7 @@ Skybox::~Skybox() {
 	glDeleteBuffers(1, &skybox_vbo);
 }
 
-void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat, uint32_t normal_tex, uint32_t color_tex) {
+void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat, uint32_t normal_tex) {
 	// depth test will not discard the pixel z=1.0
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
@@ -98,8 +98,6 @@ void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_texture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, normal_tex);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, color_tex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -81,6 +81,7 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   lightingpass_shader->setInt("gNormal", 1);
   lightingpass_shader->setInt("gAlbedo", 2);
   lightingpass_shader->setInt("gMetallicRoughness", 3);
+  lightingpass_shader->setInt("shadow_map", 4);
   lightingpass_shader->unuse();
 
 }
@@ -99,7 +100,8 @@ void Deferrdpass::Draw(
     std::shared_ptr<Framebuffer> dst,
     std::unordered_map<std::string, std::shared_ptr<Model>> &scene,
     std::shared_ptr<Camera> cam, std::shared_ptr<Quad> quad,
-    std::shared_ptr<Skybox> skybox, std::vector<std::shared_ptr<Light>>&lights) {
+	std::shared_ptr<Skybox> skybox, std::vector<std::shared_ptr<Light>>& lights,
+	uint32_t shadowmap) {
   glViewport(0, 0, width, height);
 
   // geometry pass
@@ -124,7 +126,7 @@ void Deferrdpass::Draw(
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     geopass_shader->unuse();
   }
-
+  //skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex());
   // send light to shader
   {
       lightingpass_shader->use();
@@ -150,6 +152,15 @@ void Deferrdpass::Draw(
 			  break;
 		  }
       }
+
+	  float near_plane = 1.0f, far_plane = 70.5f;
+	  glm::mat4 lightProjection =
+		  glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
+	  glm::mat4 lightView = glm::lookAt(glm::vec3(5.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+		  glm::vec3(0.0f, 1.0f, 0.0f));
+	  glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+      lightingpass_shader->setMat4("lightMVP",lightSpaceMatrix);
+
       lightingpass_shader->unuse();
   }
 
@@ -170,13 +181,16 @@ void Deferrdpass::Draw(
     glBindTexture(GL_TEXTURE_2D, gAlbedo);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gMetallicRoughness);
+    glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, shadowmap);
+
     quad->Draw();
     lightingpass_shader->unuse();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
   // skybox
   {
-	  skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex(), AlbedoTex());
+	  //skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex(), AlbedoTex());
   }
 }
 

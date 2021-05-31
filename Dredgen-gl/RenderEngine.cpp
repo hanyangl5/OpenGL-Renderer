@@ -25,11 +25,11 @@ void RenderEngine::Update() {
 
 void RenderEngine::Render() {
 
-  //shadowpass->Draw(scene, lights);
-  deferred_pass->Draw(base_fbo, scene, main_cam,quad, skybox, lights);
+  shadowpass->Draw(scene, lights);
+  deferred_pass->Draw(base_fbo, scene, main_cam,quad, skybox, lights,shadowpass->GetShadowTex());
   //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
-  //postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
-  //aa_pass->Draw(base_fbo, quad);
+  postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  aa_pass->Draw(base_fbo, quad);
 }
 uint32_t RenderEngine::GetTexture() { return base_fbo->fbo; }
 
@@ -139,7 +139,8 @@ void RenderEngine::InitAssets()
     scene["helmet"]->transform.pos = glm::vec3(0.0, 2.0, 0.0);
 	scene.insert({ "sponza", std::make_shared<Model>(
 								"../resources/models/Sponza/glTF/Sponza.gltf") });
-
+    scene.insert({"plane",std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf") });
+    scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
 	for (unsigned int i = 0; i < 32; i++) {
 	    // calculate slightly random offsets
 	    float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
@@ -154,6 +155,6 @@ void RenderEngine::InitAssets()
         lights.push_back(std::make_shared<PointLight>(col, pos));
 	}
     //lights.push_back(std::make_shared<PointLight>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, 1.0, 0.0)));
-    lights.push_back(std::make_shared<DirectLight>(1.0f * glm::vec3(1.0, 0.9568, 0.4392), glm::vec3(0.0, 0.0, 0.0), glm::vec3(-1.0, -1.0, -1.0)));
+    lights.push_back(std::make_shared<DirectLight>(4.0f * glm::vec3(1.0, 0.9568, 0.4392), glm::vec3(0.0, 0.0, 0.0), glm::vec3(-1.0, -1.0, -1.0)));
   
 }
