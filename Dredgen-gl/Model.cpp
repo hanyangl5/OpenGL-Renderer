@@ -104,6 +104,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
       vector.z = mesh->mNormals[i].z;
       vertex.normal = vector;
     }
+    else { Log::Log(mesh->mName.C_Str(),"no normal"); }
     // texture coordinates
     if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
     {

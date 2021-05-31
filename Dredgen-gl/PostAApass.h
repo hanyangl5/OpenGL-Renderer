@@ -9,7 +9,7 @@ public:
 	~PostAApass();
 	void Draw(std::shared_ptr<Framebuffer> color_fbo, std::shared_ptr<Quad> quad);
 public:
-	float luma_threshold=1.0f;
+	float luma_threshold=0.6f;
 private:
 	std::shared_ptr<Shader> postaa_shader;
 	uint32_t width, height;

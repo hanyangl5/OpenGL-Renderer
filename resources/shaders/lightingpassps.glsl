@@ -17,7 +17,7 @@ struct DirectLight {
   vec3 Color;
 };
 
-const int NR_LIGHTS = 32;
+const int NR_LIGHTS = 16;
 uniform PointLight point_lights[NR_LIGHTS];
 uniform DirectLight direct_lights[NR_LIGHTS];
 uniform vec3 viewPos;

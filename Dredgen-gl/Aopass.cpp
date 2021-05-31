@@ -10,6 +10,7 @@ Aopass::Aopass(uint32_t w, uint32_t h) : width(w), height(h) {
   ao_shader->setInt("color_texture", 0);
   ao_shader->setInt("pos_tex", 1);
   ao_shader->setInt("normal_tex", 2);
+  ao_shader->unuse();
 }
 void Aopass::SetSSAOFactor(float factor) { this->factor = factor; }
 void Aopass::Draw(std::shared_ptr<Framebuffer> color_fbo, uint32_t pos_tex, uint32_t normal_tex,

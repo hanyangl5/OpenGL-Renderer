@@ -21,8 +21,8 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   glBindTexture(GL_TEXTURE_2D, gPosition);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA,
                GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          gPosition, 0);
 
@@ -31,8 +31,8 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   glBindTexture(GL_TEXTURE_2D, gNormal);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA,
                GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
                          gNormal, 0);
 
@@ -41,8 +41,8 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   glBindTexture(GL_TEXTURE_2D, gAlbedo);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D,
                          gAlbedo, 0);
 
@@ -50,8 +50,8 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   glBindTexture(GL_TEXTURE_2D, gMetallicRoughness);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 	  GL_UNSIGNED_BYTE, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D,
       gMetallicRoughness, 0);
 
@@ -81,6 +81,7 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
   lightingpass_shader->setInt("gNormal", 1);
   lightingpass_shader->setInt("gAlbedo", 2);
   lightingpass_shader->setInt("gMetallicRoughness", 3);
+  lightingpass_shader->unuse();
 
 }
 
@@ -149,6 +150,7 @@ void Deferrdpass::Draw(
 			  break;
 		  }
       }
+      lightingpass_shader->unuse();
   }
 
   // lighting pass
@@ -174,7 +176,7 @@ void Deferrdpass::Draw(
   }
   // skybox
   {
-	  //skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex());
+	  skybox->Draw(dst, cam->projection, glm::mat3(cam->GetViewMatrix()), NormalTex(), AlbedoTex());
   }
 }
 

@@ -27,9 +27,9 @@ void RenderEngine::Render() {
 
   //shadowpass->Draw(scene, lights);
   deferred_pass->Draw(base_fbo, scene, main_cam,quad, skybox, lights);
-  ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
-  postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
-  //aa_pass->Draw(base_fbo, quad);a
+  //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
+  //postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
+  //aa_pass->Draw(base_fbo, quad);
 }
 uint32_t RenderEngine::GetTexture() { return base_fbo->fbo; }
 
@@ -128,7 +128,7 @@ void RenderEngine::Init() {
   // "../resources/shaders/modelps.glsl") }); ubolight =
   // std::make_shared<UboLight>(shaders.at("modelshader"));
 
-  skybox = std::make_shared<Skybox>("../resources/textures/CornellBox");
+  skybox = std::make_shared<Skybox>("../resources/textures/Indoor",width,height);
 
   InitAssets();
 }

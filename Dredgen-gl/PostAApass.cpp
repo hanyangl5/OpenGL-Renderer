@@ -10,6 +10,10 @@ PostAApass::PostAApass(uint32_t w, uint32_t h) : width(w), height(h) {
 
 	postaa_shader->use();
 	postaa_shader->setInt("screenTexture", 0);
+	postaa_shader->setInt("WIDTH", w);
+	postaa_shader->setInt("HEIGHT", h);
+	postaa_shader->unuse();
+	Log::Log("post aa pass initialized, ", w, " ", h);
 }
 
 PostAApass::~PostAApass() {}

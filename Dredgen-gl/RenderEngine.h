@@ -17,7 +17,6 @@
 #include "Postprocesspass.h"
 #include "Shadowpass.h"
 #include "Skybox.h"
-#include "Uniformbuffer.h"
 #include "utils.h"
 #include "PostAApass.h"
 class RenderEngine {
@@ -45,7 +44,6 @@ private:
   // std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};
   std::unordered_map<std::string, std::shared_ptr<Model>> scene;
   std::vector<std::shared_ptr<Light>> lights;
-  std::shared_ptr<UboLight> ubolight{};
 
   std::shared_ptr<Framebuffer> base_fbo;
   std::shared_ptr<Shadowpass> shadowpass;

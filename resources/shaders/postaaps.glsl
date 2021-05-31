@@ -6,18 +6,23 @@ out vec4 FragColor;
 
 uniform sampler2D screenTexture;
 uniform float luma_threshold;
-
-vec4 fxaa(sampler2D tex, vec2 fragCoord);
-
-void main() { FragColor = fxaa(screenTexture, TexCoords); }
+uniform int WIDTH, HEIGHT;
 
 vec4 fxaa(sampler2D tex, vec2 fragCoord) {
   vec4 color;
   // sample neighbour texture color
-  vec3 rgbNW = texture2D(tex, (fragCoord + vec2(-1, 1))).rgb;
-  vec3 rgbNE = texture2D(tex, (fragCoord + vec2(1, 1))).rgb;
-  vec3 rgbSW = texture2D(tex, (fragCoord + vec2(-1, -1))).rgb;
-  vec3 rgbSE = texture2D(tex, (fragCoord + vec2(1, -1))).rgb;
+  vec3 rgbNW =
+      texture2D(tex, fragCoord + vec2(-1.0 / float(WIDTH), 1.0 / float(HEIGHT)))
+          .rgb;
+  vec3 rgbNE =
+      texture2D(tex, fragCoord + vec2(1.0 / float(WIDTH), 1.0 / float(HEIGHT)))
+          .rgb;
+  vec3 rgbSW = texture2D(tex, fragCoord + vec2(-1.0 / float(WIDTH),
+                                               -1.0 / float(HEIGHT)))
+                   .rgb;
+  vec3 rgbSE =
+      texture2D(tex, fragCoord + vec2(1.0 / float(WIDTH), -1.0 / float(HEIGHT)))
+          .rgb;
 
   vec3 rgbM = texture2D(tex, fragCoord).rgb;
   // calculate luminance
@@ -31,11 +36,14 @@ vec4 fxaa(sampler2D tex, vec2 fragCoord) {
   float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
   float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
   float lumaContrast = lumaMax - lumaMin;
-  return vec4(lumaContrast, lumaContrast, lumaContrast, 1.0);
-  // no aa
-  // if (lumaMax - lumaMin <= lumaMax * luma_threshold 0) {
-  //   color = vec4(rgbM, 1.0);
-  //   return color;
-  // } else
-  //   return vec4(1.0, 1.0, 1.0, 1.0);
+  // skipping low contrast pixels
+  if (lumaContrast < lumaMax * luma_threshold) {
+    return vec4(rgbM, 1.0);
+  }
+  // calculating blending factor
+  return vec4(0.2 * (rgbNE + rgbNE + rgbSW + rgbSE + rgbM), 1.0);
+
+  // return vec4(1.0, 1.0, 1.0, 1.0);
 }
+
+void main() { FragColor = fxaa(screenTexture, TexCoords); }

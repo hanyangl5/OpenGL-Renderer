@@ -34,7 +34,7 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height)
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     Log::Err("Failed to initialize GLAD");
   }
-  edit_mode = std::make_shared<EditMode>(800, 600);
+  edit_mode = std::make_shared<EditMode>(1280, 900);
   //edit_mode = std::make_shared<EditMode>(1800, 900);
 }
 Editor::~Editor() {
@@ -159,10 +159,11 @@ void Editor::Run() {
     }
     // assets
     if (1) {
-      ImGui::SetNextWindowPos(ImVec2(0, 665));
-      ImGui::SetNextWindowSize(ImVec2(815, 330));
-      ImGuiWindowFlags window_flags =
-          ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
+      //ImGui::SetNextWindowPos(ImVec2(0, 665));
+      //ImGui::SetNextWindowSize(ImVec2(815, 330));
+      //ImGuiWindowFlags window_flags =
+      //    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse;
+	  ImGuiWindowFlags window_flags =ImGuiWindowFlags_NoScrollWithMouse;
       ImGui::Begin("Assets", 0, window_flags);
 
       static int selected = -1;

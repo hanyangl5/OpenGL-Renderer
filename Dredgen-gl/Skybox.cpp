@@ -4,7 +4,7 @@
 #include <array>
 #include <stb_image.h>
 #include <string>
-Skybox::Skybox(std::string dirpath) {
+Skybox::Skybox(std::string dirpath, uint32_t w, uint32_t h) {
 	std::array<float, 108> skyboxVertices{
 		// positions
 		-1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
@@ -69,7 +69,11 @@ Skybox::Skybox(std::string dirpath) {
 			"../resources/shaders/skyboxps.glsl", "");
 	skyboxshader->use();
 	skyboxshader->setInt("skybox", 0);
-	skyboxshader->setInt("Normal", 1);
+	skyboxshader->setInt("normal_tex", 1);
+	skyboxshader->setInt("color_tex", 2);
+	skyboxshader->setInt("WIDTH", w);
+	skyboxshader->setInt("HEIGHT", h);
+	skyboxshader->unuse();
 }
 
 Skybox::~Skybox() {
@@ -77,12 +81,16 @@ Skybox::~Skybox() {
 	glDeleteBuffers(1, &skybox_vbo);
 }
 
-void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat, uint32_t normal_tex) {
+void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3 viewmat, uint32_t normal_tex, uint32_t color_tex) {
 	// depth test will not discard the pixel z=1.0
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
+
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	//glDepthFunc(GL_LEQUAL);
+	//glDisable(GL_CULL_FACE);
 	skyboxshader->use();
 	skyboxshader->setMat4("vp", projmat * glm::mat4(viewmat));
 	glBindVertexArray(skybox_vao);
@@ -90,6 +98,8 @@ void Skybox::Draw(std::shared_ptr<Framebuffer> fbo, glm::mat4 projmat, glm::mat3
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_texture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, normal_tex);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, color_tex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
