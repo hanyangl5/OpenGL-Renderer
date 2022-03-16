@@ -9,7 +9,7 @@
 
 Model::Model(std::string const &path, bool gamma) {
   gammaCorrection = gamma;
-  loadModel(path);
+  LoadModel(path);
 }
 
 Model::~Model() {
@@ -22,13 +22,13 @@ Model::~Model() {
 void Model::Draw(Shader &shader, RenderMode renermode = Triangle) {
 
   for (uint32_t i = 0; i < meshes.size(); i++) {
-    glm::mat4 model_mat = GetModelMat() * meshes[i]->GetModelMat();
+    glm::mat4 model_mat = GetModelMatrix() * meshes[i]->GetModelMatrix();
     shader.setMat4("model", model_mat);
     meshes[i]->Draw(shader, rendermode);
   }
 }
 
-glm::mat4 Model::GetModelMat() {
+glm::mat4 Model::GetModelMatrix() {
   glm::mat4 ret = glm::mat4(1.0);
   ret = glm::translate(ret, transform.pos);
   //
@@ -48,7 +48,7 @@ glm::mat4 Model::GetModelMat() {
   return ret;
 }
 
-void Model::loadModel(std::string const &path) {
+void Model::LoadModel(std::string const &path) {
   Log::Log("loading model at:", path);
   Assimp::Importer importer;
   const aiScene *scene = importer.ReadFile(
@@ -60,14 +60,14 @@ void Model::loadModel(std::string const &path) {
     return;
   }
   directory = path.substr(0, path.find_last_of('/'));
-  processNode(scene->mRootNode, scene);
+  ProcessNode(scene->mRootNode, scene);
 }
 
-void Model::processNode(aiNode *node, const aiScene *scene) {
+void Model::ProcessNode(aiNode *node, const aiScene *scene) {
   for (uint32_t i = 0; i < node->mNumMeshes; i++) {
     node->mTransformation;
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    Mesh _mesh = processMesh(mesh, scene);
+    Mesh _mesh = ProcessMesh(mesh, scene);
     _mesh.meshname = node->mName.C_Str();
     auto t = node->mTransformation;
     _mesh.model_mat = glm::mat4(t.a1, t.b1, t.c1, t.d1, t.a2, t.b2, t.c2, t.d2,
@@ -75,11 +75,11 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     meshes.push_back(std::make_shared<Mesh>(_mesh));
   }
   for (uint32_t i = 0; i < node->mNumChildren; i++) {
-    processNode(node->mChildren[i], scene);
+    ProcessNode(node->mChildren[i], scene);
   }
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
   // data to fill
   std::vector<Vertex> vertices;
   std::vector<uint32_t> indices;
@@ -149,15 +149,15 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   // 1. albedo maps
 
   std::vector<Texture> albedoMaps =
-      loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo");
+      LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo");
   textures.insert(textures.end(), albedoMaps.begin(), albedoMaps.end());
 
   // 3. normal maps
   std::vector<Texture> normalMaps =
-      loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+      LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
   textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-  std::vector<Texture> MetallicRoughnessMaps = loadMaterialTextures(
+  std::vector<Texture> MetallicRoughnessMaps = LoadMaterialTextures(
       material, aiTextureType_UNKNOWN, "texture_metallicroughness");
   textures.insert(textures.end(), MetallicRoughnessMaps.begin(),
       MetallicRoughnessMaps.end());
@@ -175,7 +175,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
+std::vector<Texture> Model::LoadMaterialTextures(aiMaterial *mat,
                                                  aiTextureType type,
                                                  std::string typeName) {
   std::vector<Texture> textures;

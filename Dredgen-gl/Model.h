@@ -25,13 +25,13 @@ public:
   Model(std::string const &path, bool gamma = false);
   ~Model();
   void Draw(Shader &shader, RenderMode renermode);
-  glm::mat4 GetModelMat();
+  glm::mat4 GetModelMatrix();
 
 private:
-  void loadModel(std::string const &path);
-  void processNode(aiNode *node, const aiScene *scene);
-  Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-  std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
+  void LoadModel(std::string const &path);
+  void ProcessNode(aiNode *node, const aiScene *scene);
+  Mesh ProcessMesh(aiMesh *mesh, const aiScene *scene);
+  std::vector<Texture> LoadMaterialTextures(aiMaterial *mat, aiTextureType type,
                                             std::string typeName);
 
 public:

@@ -33,12 +33,12 @@ void RenderEngine::Render() {
 }
 uint32_t RenderEngine::GetTexture() { return base_fbo->fbo; }
 
-void RenderEngine::GetSceneStat() {
+void RenderEngine::GetSceneStats() {
 
   // ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize |
   // ImGuiWindowFlags_NoScrollWithMouse;
   ImGui::Begin("scene");
-  ImGui::SliderFloat("ssao factor", &ao_pass->factor, 0.001f,0.05f);
+  ImGui::SliderFloat("ssao factor", &ao_pass->kernel_radius, 0.001f,0.05f);
   ImGui::SliderFloat("luma threshold", &aa_pass->luma_threshold, 0.00001f,1.0f);
   static int s_selected = -1;
   int index = 0;
@@ -137,10 +137,10 @@ void RenderEngine::InitAssets()
 {
 	scene.insert({ "helmet",std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf") });
     scene["helmet"]->transform.pos = glm::vec3(0.0, 2.0, 0.0);
-	scene.insert({ "sponza", std::make_shared<Model>(
-								"../resources/models/Sponza/glTF/Sponza.gltf") });
-    scene.insert({"plane",std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf") });
-    scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
+	//scene.insert({ "sponza", std::make_shared<Model>(
+	//							"../resources/models/Sponza/glTF/Sponza.gltf") });
+    //scene.insert({"plane",std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf") });
+    //scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
 	for (unsigned int i = 0; i < 32; i++) {
 	    // calculate slightly random offsets
 	    float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;

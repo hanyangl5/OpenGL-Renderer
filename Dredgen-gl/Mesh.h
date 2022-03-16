@@ -27,10 +27,10 @@ public:
        std::vector<Texture> textures);
   void ReleaseBuffer();
   void Draw(Shader &shader, RenderMode renermode);
-  glm::mat4 GetModelMat();
+  glm::mat4 GetModelMatrix();
 
 private:
-  void setupMesh();
+  void SetupMesh();
 
 public:
   // glm::vec3 translation;

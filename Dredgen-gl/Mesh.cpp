@@ -9,7 +9,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices,
 
   // now that we have all the required data, set the vertex buffers and its
   // attribute pointers.
-  setupMesh();
+  SetupMesh();
 }
 
 void Mesh::ReleaseBuffer() {
@@ -61,9 +61,9 @@ void Mesh::Draw(Shader &shader, RenderMode renermode) {
   glActiveTexture(GL_TEXTURE0);
 }
 
-glm::mat4 Mesh::GetModelMat() { return model_mat; }
+glm::mat4 Mesh::GetModelMatrix() { return model_mat; }
 
-void Mesh::setupMesh()
+void Mesh::SetupMesh()
 
 {
   // create buffers/arrays

@@ -230,7 +230,7 @@ void Editor::Run() {
       ImGui::End();
     }
     if (1) {
-      edit_mode->GetSceneStat();
+      edit_mode->GetSceneStats();
     }
 
     ImGui::Render();
@@ -287,7 +287,7 @@ void EditMode::AddModel(std::string name, std::string path) {
   render_engine->AddModel(name, path);
 }
 
-void EditMode::GetSceneStat() { render_engine->GetSceneStat(); }
+void EditMode::GetSceneStats() { render_engine->GetSceneStats(); }
 
 // uint32_t EditMode::RenderAt(std::shared_ptr<Camera> cam)
 //{
