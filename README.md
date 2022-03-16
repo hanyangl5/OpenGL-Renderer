@@ -2,7 +2,11 @@
 
 ![](resources/figs/ex3.png)
 
-**rendering architecture**
+- Deferred Shading Pipeline
+- physically based shading model for opaque material
+- real time shadowing algorithm, shadow mapping and percentage closer filtering
 
-( Shadow Pass ) -> Geometry Pass -> Deferred Lighting Pass -> Screen Space AO Pass ->Post Process Pass -> Post AA Pass
+**RENDERING PIPELINE**
+
+Shadow Pass  -> Geometry Pass -> Deferred Lighting Pass ->Post Process Pass -> Post AA Pass
 
