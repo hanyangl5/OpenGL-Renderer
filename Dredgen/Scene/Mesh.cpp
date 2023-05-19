@@ -37,7 +37,7 @@ void Mesh::Draw(Shader &shader, RenderMode renermode) {
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
-    // glActiveTexture(GL_TEXTURE0+textures.size());
+
     // draw mesh
     glBindVertexArray(VAO);
     switch (renermode) {

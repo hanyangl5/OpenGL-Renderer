@@ -121,17 +121,20 @@ void RenderEngine::Init() {
     // "../resources/shaders/modelps.glsl") }); ubolight =
     // std::make_shared<UboLight>(shaders.at("modelshader"));
 
-    skybox = std::make_shared<Skybox>("../resources/textures/Indoor", width, height);
+    skybox = std::make_shared<Skybox>("../resources/textures/yohohama2", width, height);
 
     InitAssets();
 }
 
 void RenderEngine::InitAssets() {
-    scene.insert({"helmet", std::make_shared<Model>("../resources/models/DamagedHelmet/DamagedHelmet.gltf")});
-    scene["helmet"]->transform.pos = glm::vec3(0.0, 2.0, 0.0);
-    scene.insert({"sponza", std::make_shared<Model>("../resources/models/Sponza/glTF/Sponza.gltf")});
-    scene.insert({"plane", std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf")});
-    scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
+    //scene.insert({"helmet", std::make_shared<Model>("../third_party/Cauldron-Media/DamagedHelmet/glTF/DamagedHelmet.gltf")});
+    scene.insert({"damagedhelmet", std::make_shared<Model>("../resources/Cauldron-Media/DamagedHelmet/glTF/DamagedHelmet.gltf")});
+    //scene.insert({"helmet", std::make_shared<Model>("E:/Dredgen-gl/resources/Cauldron-Media/SciFiHelmet/glTF/SciFiHelmet.gltf")});
+    scene.insert({"sponza", std::make_shared<Model>("../resources/Cauldron-Media/Sponza/glTF/Sponza.gltf")});
+    scene["damagedhelmet"]->transform.pos = glm::vec3(0.0, 2.0, 0.0);
+    //scene.insert({"sponza", std::make_shared<Model>("../resources/models/Sponza/glTF/Sponza.gltf")});
+    //scene.insert({"plane", std::make_shared<Model>("../resources/models/Cube/glTF/Cube.gltf")});
+    //scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
     for (unsigned int i = 0; i < 32; i++) {
         // calculate slightly random offsets
         float xPos = ((rand() % 100) / 100.0f) * 6.0f - 3.0f;
@@ -143,7 +146,7 @@ void RenderEngine::InitAssets() {
         float gColor = ((rand() % 100) / 200.0f) + 0.5f; // between 0.5 and 1.0
         float bColor = ((rand() % 100) / 200.0f) + 0.5f; // between 0.5 and 1.0
         glm::vec3 col(rColor, gColor, bColor);
-        lights.push_back(std::make_shared<PointLight>(col, pos));
+        //lights.push_back(std::make_shared<PointLight>(col, pos));
     }
     //lights.push_back(std::make_shared<PointLight>(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, 1.0, 0.0)));
     lights.push_back(std::make_shared<DirectLight>(4.0f * glm::vec3(1.0, 0.9568, 0.4392), glm::vec3(0.0, 0.0, 0.0),

@@ -27,6 +27,7 @@ void Model::Draw(Shader &shader, RenderMode _rendermode = Triangle) {
     for (uint32_t i = 0; i < meshes.size(); i++) {
         glm::mat4 model_mat = GetModelMat() * meshes[i]->GetModelMat();
         shader.setMat4("model", model_mat);
+        
         meshes[i]->Draw(shader, _rendermode);
     }
 }
@@ -154,21 +155,26 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     textures.insert(textures.end(), albedoMaps.begin(), albedoMaps.end());
 
     // 3. normal maps
-    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
     std::vector<Texture> MetallicRoughnessMaps =
         loadMaterialTextures(material, aiTextureType_UNKNOWN, "texture_metallicroughness");
     textures.insert(textures.end(), MetallicRoughnessMaps.begin(), MetallicRoughnessMaps.end());
 
-    //Log::Log("albedo texture:");
-    //for (auto& i : albedoMaps) {
-    // Log::Log(i.path);
-    //}
-    //Log::Log("metallic texture:");
-    //for (auto &i : MetallicRoughnessMaps) {
-    //   Log::Log(i.path);
-    //}
+    Log::Log("albedo texture:");
+    for (auto& i : albedoMaps) {
+     Log::Log(i.path);
+    }
+    Log::Log("normal texture:");
+    for (auto &i : normalMaps) {
+        Log::Log(i.path);
+    }
+
+    Log::Log("metallic texture:");
+    for (auto &i : MetallicRoughnessMaps) {
+       Log::Log(i.path);
+    }
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
@@ -214,14 +220,14 @@ uint32_t TextureFromFile(const char *path, const std::string &directory, [[maybe
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
-        GLenum format = GL_RGBA;
+        GLenum format = GL_RGB;
         if (nrComponents == 1)
             format = GL_RED;
         else if (nrComponents == 3)
             format = GL_RGB;
         else if (nrComponents == 4)
             format = GL_RGBA;
-        else
+        
             glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
