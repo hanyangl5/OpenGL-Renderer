@@ -41,7 +41,11 @@ jobs:
           packaging_maintainer_mode: ${{ matrix.packaging_maintainer_mode }}
           generator: ${{ matrix.generator }}
           submodules: true
-
+    # Update references
+      - name: Git Sumbodule Update
+        run: |
+          git pull --recurse-submodules
+          git submodule update --remote --recursive
       - name: Project Name
         uses: cardinalby/export-env-action@v2
         with:
