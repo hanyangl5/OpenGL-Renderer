@@ -1,11 +1,11 @@
 #include "RenderEngine.h"
 
-#include <glad.h>
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
 #include "Imgui/imgui_impl_opengl3.h"
-#include "Log.h"
+#include "Utils/Log.h"
 #include <array>
+#include <glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -27,7 +27,7 @@ void RenderEngine::Render() {
 
     shadowpass->Draw(scene, lights);
     deferred_pass->Draw(base_fbo, scene, main_cam, quad, skybox, lights, shadowpass->GetShadowTex());
-    //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad);
+    //ao_pass->Draw(base_fbo, deferred_pass->PosTex(),deferred_pass->NormalTex(), quad); // disabled for performance issue
     postprocess_pass->Draw(base_fbo, quad); // take color buffer as input
     aa_pass->Draw(base_fbo, quad);
 }
@@ -49,7 +49,7 @@ void RenderEngine::GetSceneStat() {
         for (auto &i : scene) {
             char label[128];
             // sprintf("%s",objects[i].directory.c_str());
-            sprintf(label, "%s", i.first.c_str());
+            sprintf_s(label, "%s", i.first.c_str());
             if (ImGui::Selectable(label, s_selected == index)) {
                 s_selected = index;
                 k = i.first.c_str();
@@ -69,8 +69,8 @@ void RenderEngine::GetSceneStat() {
             if (ImGui::BeginTabItem("Transform")) {
                 auto &chosen_obj = scene.at(k);
                 ImGui::InputFloat3("position", glm::value_ptr(chosen_obj->transform.pos));
-                ImGui::SliderFloat3("rotation", glm::value_ptr(chosen_obj->transform.rot), 0.0, 360);
-                ImGui::SliderFloat3("scale", glm::value_ptr(chosen_obj->transform.scale), 0.01, 5.0);
+                ImGui::SliderFloat3("rotation", glm::value_ptr(chosen_obj->transform.rot), 0.0f, 360.f);
+                ImGui::SliderFloat3("scale", glm::value_ptr(chosen_obj->transform.scale), 0.01f, 5.0f);
                 // int* a = ;
                 // ImGui::InputInt("rendermode",
                 // reinterpret_cast<int*>(&chosen_obj.rendermode)); std::cout <<
@@ -110,11 +110,11 @@ void RenderEngine::Init() {
 
     quad = std::make_shared<Quad>();
     base_fbo = std::make_shared<Framebuffer>(width, height);
-    shadowpass = std::make_shared<Shadowpass>(width, height);
-    deferred_pass = std::make_shared<Deferrdpass>(width, height);
-    ao_pass = std::make_shared<Aopass>(width, height);
+    shadowpass = std::make_shared<Shadow>(width, height);
+    deferred_pass = std::make_shared<GeometyPass>(width, height);
+    ao_pass = std::make_shared<SSAO>(width, height);
     postprocess_pass = std::make_shared<PostProcesspass>(width, height);
-    aa_pass = std::make_shared<PostAApass>(width, height);
+    aa_pass = std::make_shared<FXAApass>(width, height);
 
     // shaders.insert({ "modelshader",
     // std::make_shared<Shader>("../resources/shaders/modelvs.glsl",
@@ -134,14 +134,14 @@ void RenderEngine::InitAssets() {
     scene["plane"]->transform.scale = glm::vec3(10.0, 0.01, 10.0);
     for (unsigned int i = 0; i < 32; i++) {
         // calculate slightly random offsets
-        float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-        float yPos = ((rand() % 100) / 100.0) * 6.0;
-        float zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+        float xPos = ((rand() % 100) / 100.0f) * 6.0f - 3.0f;
+        float yPos = ((rand() % 100) / 100.0f) * 6.0f;
+        float zPos = ((rand() % 100) / 100.0f) * 6.0f - 3.0f;
         glm::vec3 pos(xPos, yPos, zPos);
         // also calculate random color
-        float rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-        float gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-        float bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+        float rColor = ((rand() % 100) / 200.0f) + 0.5f; // between 0.5 and 1.0
+        float gColor = ((rand() % 100) / 200.0f) + 0.5f; // between 0.5 and 1.0
+        float bColor = ((rand() % 100) / 200.0f) + 0.5f; // between 0.5 and 1.0
         glm::vec3 col(rColor, gColor, bColor);
         lights.push_back(std::make_shared<PointLight>(col, pos));
     }

@@ -40,7 +40,7 @@ jobs:
           build_type: ${{ matrix.build_type }}
           packaging_maintainer_mode: ${{ matrix.packaging_maintainer_mode }}
           generator: ${{ matrix.generator }}
-          submodules: recursive
+          submodules: true
     # Update references
       - name: Git Sumbodule Update
         run: |

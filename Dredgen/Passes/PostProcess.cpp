@@ -1,6 +1,6 @@
 #include <glad.h>
-#include "Postprocesspass.h"
-#include "Log.h"
+#include "PostProcess.h"
+#include "Utils/Log.h"
 
 
 PostProcesspass::PostProcesspass(uint32_t w, uint32_t h) : width(w), height(h) {

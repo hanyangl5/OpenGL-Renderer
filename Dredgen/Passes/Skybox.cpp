@@ -1,5 +1,5 @@
 #include "Skybox.h"
-#include "Log.h"
+#include "Utils/Log.h"
 #include <array>
 #include <glad.h>
 #include <stb/stb_image.h>

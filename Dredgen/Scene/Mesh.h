@@ -1,6 +1,6 @@
 #pragma once
-#include "Shader.h"
-#include "Vertex.h"
+#include "Render/Shader.h"
+#include "Render/Vertex.h"
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

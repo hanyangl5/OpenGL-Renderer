@@ -1,9 +1,9 @@
 #pragma once
-#include "Shader.h"
+#include "Render/Shader.h"
 #include <cstdint>
 #include <memory>
 #include <string>
-#include "Framebuffer.h"
+#include "Render/Framebuffer.h"
 class Skybox {
 public:
   Skybox(std::string dirpath, uint32_t w, uint32_t h);

@@ -17,10 +17,9 @@ add_subdirectory(thirdparty/glad45)
 add_subdirectory(thirdparty/nativefiledialog)
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
+include(cmake/compileoptions.cmake)
 
-
-
-
+configure_compile_options(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/Dredgen
     thirdparty/glm/

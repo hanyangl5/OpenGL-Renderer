@@ -1,7 +1,7 @@
 #include <glad.h>
 
 #include "Framebuffer.h"
-#include "Log.h"
+#include "Utils/Log.h"
 
 
 Framebuffer::Framebuffer(uint32_t w, uint32_t h) : width(w), height(h) {

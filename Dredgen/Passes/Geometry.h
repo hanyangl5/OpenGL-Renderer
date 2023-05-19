@@ -1,19 +1,19 @@
 #pragma once
-#include "Camera.h"
-#include "Framebuffer.h"
-#include "Model.h"
-#include "Shader.h"
-#include "Skybox.h"
-#include "utils.h"
+#include "Scene/Camera.h"
+#include "Render/Framebuffer.h"
+#include "Scene/Model.h"
+#include "Render/Shader.h"
+#include "Passes/Skybox.h"
+#include "Utils/utils.h"
 #include <array>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
-#include "Light.h"
-class Deferrdpass {
+#include "Scene/Light.h"
+class GeometyPass {
 public:
-  Deferrdpass(uint32_t w, uint32_t h);
-  ~Deferrdpass();
+  GeometyPass(uint32_t w, uint32_t h);
+  ~GeometyPass();
   void Draw(std::shared_ptr<Framebuffer> dst,
             std::unordered_map<std::string, std::shared_ptr<Model>> &scene,
             std::shared_ptr<Camera> cam,

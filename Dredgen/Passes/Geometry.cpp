@@ -1,10 +1,10 @@
 #include <glad.h>
-#include "Deferrdpass.h"
-#include "Light.h"
+#include "Geometry.h"
+#include "Scene/Light.h"
 
 
 
-Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
+GeometyPass::GeometyPass(uint32_t w, uint32_t h) : width(w), height(h) {
 
   geopass_shader =
       std::make_shared<Shader>("../resources/shaders/geopassvs.glsl",
@@ -86,7 +86,7 @@ Deferrdpass::Deferrdpass(uint32_t w, uint32_t h) : width(w), height(h) {
 
 }
 
-Deferrdpass::~Deferrdpass() {
+GeometyPass::~GeometyPass() {
 
   // glDeleteBuffers(GL_FRAMEBUFFER, &gBuffer);
   // glDeleteRenderbuffers(GL_RENDERBUFFER, &rboDepth);
@@ -96,7 +96,7 @@ Deferrdpass::~Deferrdpass() {
 }
 
 // dst frame buffer, scene, cam, skybox
-void Deferrdpass::Draw(
+void GeometyPass::Draw(
     std::shared_ptr<Framebuffer> dst,
     std::unordered_map<std::string, std::shared_ptr<Model>> &scene,
     std::shared_ptr<Camera> cam, std::shared_ptr<Quad> quad,
@@ -194,8 +194,8 @@ void Deferrdpass::Draw(
   }
 }
 
-uint32_t Deferrdpass::PosTex() const { return gPosition; }
+uint32_t GeometyPass::PosTex() const { return gPosition; }
 
-uint32_t Deferrdpass::NormalTex() const { return gNormal; }
+uint32_t GeometyPass::NormalTex() const { return gNormal; }
 
-uint32_t Deferrdpass::AlbedoTex() const { return gAlbedo; }
+uint32_t GeometyPass::AlbedoTex() const { return gAlbedo; }

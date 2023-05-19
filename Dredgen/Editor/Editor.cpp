@@ -7,10 +7,10 @@
 #include <nfd.h>
 
 #include "Editor.h"
-#include "Log.h"
-#include "utils.h"
+#include "Utils/Log.h"
+#include "Utils/Utils.h"
 
-Editor::Editor(const char *_name, uint32_t _width, uint32_t _height) : width(_width), height(_height) {
+Editor::Editor([[maybe_unused]] const char *_name, uint32_t _width, uint32_t _height) : width(_width), height(_height) {
     width = _width;
     height = _height;
     if (glfwInit() != GLFW_TRUE) {
@@ -18,8 +18,8 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height) : width(_wi
         Log::Log("failed to init glfw");
     };
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.6);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     base_window = glfwCreateWindow(width, height, "Dredgen-gl", nullptr, nullptr);
 
     if (!base_window) {
@@ -29,7 +29,7 @@ Editor::Editor(const char *_name, uint32_t _width, uint32_t _height) : width(_wi
 
     glfwMakeContextCurrent(base_window);
     glfwSwapInterval(0); // Enable vsync
-    
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         Log::Err("Failed to initialize GLAD");
     }
@@ -56,8 +56,8 @@ void Editor::Run() {
     ImGui_ImplGlfw_InitForOpenGL(base_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
-    bool show_demo_window = true;
-    bool show_another_window = false;
+    //bool show_demo_window = true;
+    //bool show_another_window = false;
     // Main loop
     while (!glfwWindowShouldClose(base_window)) {
         glfwPollEvents();
@@ -147,9 +147,11 @@ void Editor::Run() {
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize;
             ImGui::Begin("EditMode", 0, window_flags);
             edit_mode->Render();
-            void *nup = nullptr;
-            auto tex = reinterpret_cast<void *>(edit_mode->GetTexture());
-            ImGui::Image(tex, ImVec2(edit_mode->width, edit_mode->height), ImVec2(0, 1), ImVec2(1, 0));
+#pragma warning(disable : 4312)
+            ImTextureID tex = (ImTextureID)edit_mode->GetTexture();
+#pragma warning(default : 4312)
+            ImGui::Image(tex, ImVec2(static_cast<float>(edit_mode->width), static_cast<float>(edit_mode->height)),
+                         ImVec2(0, 1), ImVec2(1, 0));
             ImGui::End();
         }
         // assets
@@ -168,7 +170,7 @@ void Editor::Run() {
                 for (int i = 0; i < objects.size(); i++) {
                     char label[128];
                     // sprintf("%s",objects[i].directory.c_str());
-                    sprintf(label, "%s", objects[i].name.c_str());
+                    sprintf_s(label, "%s", objects[i].name.c_str());
                     if (ImGui::Selectable(label, selected == i))
                         selected = i;
                 }
