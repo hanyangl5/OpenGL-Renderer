@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-        submodules: recursive
+      submodules: recursive
 
     - name: submodules recursively
       run: git submodule update --init --recursive
