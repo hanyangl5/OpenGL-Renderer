@@ -40,6 +40,7 @@ jobs:
           build_type: ${{ matrix.build_type }}
           packaging_maintainer_mode: ${{ matrix.packaging_maintainer_mode }}
           generator: ${{ matrix.generator }}
+          submodules: true
 
       - name: Project Name
         uses: cardinalby/export-env-action@v2
