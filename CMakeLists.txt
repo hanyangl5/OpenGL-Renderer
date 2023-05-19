@@ -28,7 +28,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     thirdparty/assimp/include
     thirdparty/glad45/
     thirdparty/stb
-    thirdparty/nativefiledialog/src
     thirdparty/nativefiledialog
 )
 
