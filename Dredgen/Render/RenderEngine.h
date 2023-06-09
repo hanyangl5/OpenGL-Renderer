@@ -11,6 +11,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+
 #include <cstdint>
 #include <glm/glm.hpp>
 
@@ -23,6 +24,12 @@
 #include "Passes/Skybox.h"
 #include "Scene/Model.h"
 #include "Utils/Utils.h"
+
+enum class RenderBackend {
+    OPENGL4,
+    DIRECTX11
+};
+
 class RenderEngine {
 
   public:
@@ -38,12 +45,13 @@ class RenderEngine {
 
   private:
     void Initglad();
-    void Init();
+    void InitDx11();
+    void InitPipelineResources();
     void InitAssets();
 
   private:
     uint32_t width{}, height{};
-
+    RenderBackend m_backend;
     std::shared_ptr<Camera> main_cam{};
     std::shared_ptr<Skybox> skybox{};
     // std::unordered_map<std::string,std::shared_ptr<Shader>> shaders{};

@@ -13,8 +13,20 @@
 RenderEngine::RenderEngine(uint32_t _width, uint32_t _height) {
     width = _width;
     height = _height;
-    Initglad();
-    Init();
+    //m_backend = backend;
+
+    switch (m_backend) {
+    case RenderBackend::OPENGL4:
+        Initglad();
+        break;
+    case RenderBackend::DIRECTX11:
+        InitDx11();
+        break;
+    default:
+        break;
+    }
+    InitPipelineResources();
+    InitAssets();
 }
 
 RenderEngine::~RenderEngine() {}
@@ -98,11 +110,16 @@ void RenderEngine::Initglad() {
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         Log::Err("Failed to initialize GLAD");
-    } else
+    } else {
         Log::Log("glad inited\n");
+    }
 }
 
-void RenderEngine::Init() {
+void RenderEngine::InitDx11() {
+
+}
+
+void RenderEngine::InitPipelineResources() {
     // camera
     main_cam = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 2.0f));
     main_cam->SetProjectionMatrix(
@@ -123,7 +140,7 @@ void RenderEngine::Init() {
 
     skybox = std::make_shared<Skybox>("../resources/textures/yohohama2", width, height);
 
-    InitAssets();
+    
 }
 
 void RenderEngine::InitAssets() {
