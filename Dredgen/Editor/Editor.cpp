@@ -10,8 +10,6 @@
 #include "Utils/Log.h"
 #include "Utils/Utils.h"
 
-GLFWwindow *main_window= nullptr;
-
 Editor::Editor([[maybe_unused]] const char *_name, uint32_t _width, uint32_t _height) : width(_width), height(_height) {
     width = _width;
     height = _height;
@@ -23,7 +21,6 @@ Editor::Editor([[maybe_unused]] const char *_name, uint32_t _width, uint32_t _he
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 5);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     base_window = glfwCreateWindow(width, height, "Dredgen", nullptr, nullptr);
-    main_window = base_window;
     if (!base_window) {
         glfwTerminate();
         Log::Err("failed to init window");

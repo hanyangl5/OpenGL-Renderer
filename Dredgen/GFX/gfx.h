@@ -3,5 +3,7 @@
 class GFX {
   public:
     GFX(){};
-    virtual ~GFX() = 0;
+    virtual ~GFX(){};
+
+    virtual CreateBuffer() = 0;
 };
