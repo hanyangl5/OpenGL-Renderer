@@ -8,5 +8,5 @@
 
 **RENDERING PIPELINE**
 
-Shadow Pass  -> Geometry Pass -> Deferred Lighting Pass ->Post Process Pass -> Post AA Pass
+Shadow Map Pass  -> Geometry Pass -> Deferred Lighting Pass -> Tone Mapping Pass -> FXAA Pass
 
